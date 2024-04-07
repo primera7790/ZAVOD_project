@@ -34,10 +34,12 @@ def main():
     df_chill_days = file.loc[null_idx_list, :]
 
     df_work_days = file.drop(index=df_chill_days.index).reset_index(drop=True)
-    df_work_days.loc[df_work_days['start_time'].notna()].apply(lambda x: str(x).split())
-    df_work_days.loc[df_work_days['end_time'].notna()].apply(lambda x: str(x).split())
+    df_work_days.loc[:, 'start_time'] = df_work_days.loc[df_work_days['start_time'].notna(), 'start_time'].apply(
+        lambda x: str(x).split())
+    df_work_days.loc[:, 'end_time'] = df_work_days.loc[df_work_days['end_time'].notna(), 'end_time'].apply(
+        lambda x: str(x).split())
 
-    df_work_days.to_csv('data/total_data/1_preparationed.csv')
+    df_work_days.to_csv('data/total_data/1_prepared.csv')
     return
 
 
