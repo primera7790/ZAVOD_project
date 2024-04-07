@@ -2,5 +2,5 @@
 zavod/data/
 zavod/archive/env/
 lab.py
-zavod/hide_correction.py
-
+beta.py
+hide_correction.py
