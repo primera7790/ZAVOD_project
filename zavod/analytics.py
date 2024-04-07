@@ -39,7 +39,7 @@ with warnings.catch_warnings():
 
 ''' Блок 5. Проверка
 '''
-f = file.loc[file['requester'] == 'Хасанов Д.Р.', ['object', 'info']]
+f = file.loc[file['requester'] == '', ['object', 'info']]
 
 print(f)
 
