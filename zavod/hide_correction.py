@@ -54,5 +54,6 @@ def main():
     file.to_csv('data/total_data/csv/2_after_knn.csv')
 
 
+
 if __name__ == '__main__':
     main()

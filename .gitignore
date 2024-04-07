@@ -1,9 +1,9 @@
 .idea/
 zavod/data/
 zavod/archive/env/
-zavod/lab.py
-zavod/beta.py
-zavod/hide_correction.py
+lab.py
+beta.py
+hide_correction.py
 
 
 
