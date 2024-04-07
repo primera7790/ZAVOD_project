@@ -44,7 +44,7 @@ def comparing(text, target_name):
 def main():
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        data_file = pd.read_csv('data/total_data/csv/1_preparationed.csv', index_col=0)
+        data_file = pd.read_csv('data/total_data/csv/1_prepared.csv', index_col=0)
         requesters_file = pd.read_csv('data/total_data/csv/requesters.csv')
 
     info_data = data_file['info'].apply(lambda x: x[:90] if len(x) > 100 else x[:50])
