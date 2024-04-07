@@ -1,4 +1,4 @@
-.idea/
+../.idea/
 zavod/data/
 zavod/archive/env/
 lab.py
