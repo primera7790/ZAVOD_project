@@ -11,10 +11,10 @@ from tqdm.auto import tqdm
 def data_filter(dirty_data: list, date_name=False, time=False):
     '''Приведение данных к общему виду
 
-    :param dirty_data: данные в виде списка
-    :param date_name: dirty_data имеет вид [дата, [мастера,]]
-    :param time: dirty_data имеет вид [время,]
-    :return:
+    :param dirty_data: list, содержащий ненормированные данные
+    :param date_name: bool, если dirty_data имеет вид [дата, [мастера,]]
+    :param time: bool, если dirty_data имеет вид [время,]
+    :return: list, содержащий нормированные данные
     '''
     filtered_data = dirty_data.copy()
     if date_name is True:
@@ -34,10 +34,10 @@ def data_filter(dirty_data: list, date_name=False, time=False):
 def change_power_data(table, row_idx, col_idx):
     '''Адресный сбор данных по мощности из таблицы
 
-    :param table: двумерная таблица с данными
-    :param row_idx: индекс строки
-    :param col_idx: индекс колонки
-    :return: список из четырех элементов
+    :param table: pandas dataframe, данные с файла
+    :param row_idx: int, индекс строки
+    :param col_idx: int, индекс колонки
+    :return: list, список из четырех элементов
     '''
 
     max_p = pd.NA if type(table.iloc[row_idx, col_idx]) is str or math.isnan(table.iloc[row_idx, col_idx]) \
@@ -54,8 +54,8 @@ def change_power_data(table, row_idx, col_idx):
 def data_normalize(data_before_norm: list):
     '''Приведение значения года в общей дате к виду 'YYYY', в частности '20..'
 
-    :param data_before_norm: список вида [день, месяц, год]
-    :return:
+    :param data_before_norm: list, список вида [день, месяц, год]
+    :return: list, список с корректными данными
     '''
     y = data_before_norm.copy()
     if len(y[2]) == 2:
@@ -64,27 +64,24 @@ def data_normalize(data_before_norm: list):
     return y
 
 
-def main():
+def data_mining(total_data, dir_path):
+    ''' Сбор и компоновка данных из excel-таблиц, конвертированных из word-документов
+
+    :param total_data: pandas dataframe, подготовленный для сбора данных
+    :param dir_path: path, содержащий путь к директории с .xlsx файлами
+    :return: .csv файл
     '''
 
-    Блок 1 - Формирование исходных данных и общей архитектуры
-
-    '''
-    excel_dir = Path(Path(__file__).parent, 'data/excel_dir')
-    names_in_dir = os.listdir(excel_dir)
-
-    df_total = pd.DataFrame(columns=['date_day', 'date_night', 'object', 'installation', 'start_time', 'end_time',
-                                     'master_day', 'master_night', 'info', 'requester', 'max_power', 'min_power',
-                                     'power_per_24_hours', 'power_supply_scheme', 'file_name'])
     '''
     
-    Блок 2 - Пофайловый сбор информации
+    > Пофайловый сбор информации
     
     '''
+    names_in_dir = os.listdir(dir_path)
     for name in tqdm(names_in_dir):
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
-            file = pd.read_excel(str(excel_dir) + f'/{name}', header=None)
+            file = pd.read_excel(str(dir_path) + f'/{name}', header=None)
 
         max_power = min_power = power_per_24_hours = power_supply_scheme = date \
             = date_day = date_night = master_day = master_night = pd.NA
@@ -94,9 +91,10 @@ def main():
         count_col = 0
         indicator = 0
         first_check = 0
+
         '''
         
-        Блок 2.1 - Построчный сбор информации
+        > Построчный сбор информации
         
         '''
         for line in file.values:
@@ -135,12 +133,12 @@ def main():
                 power_data = change_power_data(file, power_line_num, count_col)
                 max_power, min_power, power_per_24_hours, power_supply_scheme = power_data
 
-                len_idx = len(df_total.index) - 1
+                len_idx = len(total_data.index) - 1
                 if first_check == 1:
-                    df_total.iloc[len_idx, 10] = max_power
-                    df_total.iloc[len_idx, 11] = min_power
-                    df_total.iloc[len_idx, 12] = power_per_24_hours
-                    df_total.iloc[len_idx, 13] = power_supply_scheme
+                    total_data.iloc[len_idx, 10] = max_power
+                    total_data.iloc[len_idx, 11] = min_power
+                    total_data.iloc[len_idx, 12] = power_per_24_hours
+                    total_data.iloc[len_idx, 13] = power_supply_scheme
             '''
             
             - date_day
@@ -152,6 +150,8 @@ def main():
             - *min_power 
             - *power_per_24_hours 
             - *power_supply_scheme
+            
+            * - в случае наличия более актуальных данных
             
             '''
             if 'Сменный мастер' in base_line:
@@ -207,7 +207,7 @@ def main():
                     if date_day > date_night:
                         date_day, date_night = date_night, date_day
 
-                df_total.loc[len(df_total.index)] = [
+                total_data.loc[len(total_data.index)] = [
                     date_day, date_night, '', '', '', '', master_day, master_night, '', '', max_power,
                     min_power, power_per_24_hours, power_supply_scheme, name
                 ]
@@ -230,22 +230,36 @@ def main():
                 end_time = data_filter([line[4]], time=True)
                 info = line[5]
 
-                total_idx = len(df_total.index)
+                total_idx = len(total_data.index)
                 if indicator == 0:
-                    total_idx = len(df_total.index) - 1
+                    total_idx = len(total_data.index) - 1
 
-                df_total.loc[total_idx] = [
+                total_data.loc[total_idx] = [
                     date_day, date_night, object_name, installation_name, start_time, end_time, master_day,
                     master_night, info, '', max_power, min_power, power_per_24_hours, power_supply_scheme, name
                 ]
                 indicator = 1
 
             if 'тказов в работе' in str(line[5]):
-                df_total.iloc[len(df_total.index) - 1, 8] = 'отказов в работе электрооборудования и электроснабжения не было'
+                total_data.iloc[len(total_data.index) - 1, 8] = 'отказов в работе электрооборудования и электроснабжения не было'
 
             count_line += 1
 
-    df_total.to_csv('data/total_data/total.csv')
+    total_data.to_csv('data/total_data/total.csv')
+
+    return
+
+
+def main():
+    excel_dir = Path(Path(__file__).parent, 'data/excel_dir')
+
+    df_total = pd.DataFrame(columns=['date_day', 'date_night', 'object', 'installation', 'start_time', 'end_time',
+                                     'master_day', 'master_night', 'info', 'requester', 'max_power', 'min_power',
+                                     'power_per_24_hours', 'power_supply_scheme', 'file_name'])
+
+    data_mining(df_total, excel_dir)
+
+    return
 
 
 if __name__ == '__main__':

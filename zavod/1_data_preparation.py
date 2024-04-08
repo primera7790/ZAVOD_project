@@ -3,22 +3,23 @@ import warnings
 import pandas as pd
 
 
-def main():
-    with warnings.catch_warnings():
-        warnings.simplefilter('ignore')
-        file = pd.read_csv('data/total_data/csv/0_total_table.csv', index_col=0)
+def main_preparation(data):
+    ''' Корректировка и стандартизация данных, переданных сразу после сбора
 
-    file.loc[file['max_power'] == file['max_power'].max(), ['max_power', 'min_power', 'power_per_24_hours']] = 77, 80, 1914
+    :param data: pandas dataframe, содержащий собранные данные без обработки
+    :return: .csv file
+    '''
+    data.loc[data['max_power'] == data['max_power'].max(), ['max_power', 'min_power', 'power_per_24_hours']] = 77, 80, 1914
 
-    while file['power_per_24_hours'].max() > 3000:
-        max_24 = file['power_per_24_hours'].max()
-        file.loc[file['power_per_24_hours'] == max_24, 'power_per_24_hours'] = int(str(int(max_24))[:-1])
+    while data['power_per_24_hours'].max() > 3000:
+        max_24 = data['power_per_24_hours'].max()
+        data.loc[data['power_per_24_hours'] == max_24, 'power_per_24_hours'] = int(str(int(max_24))[:-1])
 
-    file.loc[file['max_power'] == file['max_power'].max(), ['max_power', 'min_power']] = pd.NA
+    data.loc[data['max_power'] == data['max_power'].max(), ['max_power', 'min_power']] = pd.NA
 
-    file['date_day'] = pd.to_datetime(file['date_day']).dt.normalize()
-    file['date_night'] = pd.to_datetime(file['date_night']).dt.normalize()
-    file.loc[file['date_day'] == file['date_night'], 'date_night'] += pd.Timedelta('1 day')
+    data['date_day'] = pd.to_datetime(data['date_day']).dt.normalize()
+    data['date_night'] = pd.to_datetime(data['date_night']).dt.normalize()
+    data.loc[data['date_day'] == data['date_night'], 'date_night'] += pd.Timedelta('1 day')
 
     null_criterion_list = ['отказов в работе электрооборудования и электроснабжения не было', 'отказа электрооборудования, сетей электроснабжения нет',
                            'отказа электрооборудования, сетей электроснабжения не было', 'неисправности, отказа электрооборудования, сетей электроснабжения не было',
@@ -26,20 +27,50 @@ def main():
                            'Неисправностей, отказа электрооборудования, сетей электроснабжения не было', 'отказа электрооборудования, сетей электроснабжения небыло.',
                            'отказа электрооборудования, сетей электроснабжения- нет', 'Неисправности ,отказа электрооборудования не было.']
 
-    null_idx_list = list(file.loc[file['info'].isnull()].index)
+    null_idx_list = list(data.loc[data['info'].isnull()].index)
     for criterion in null_criterion_list:
-        idx_list = list(file.loc[file['info'] == criterion].index)
+        idx_list = list(data.loc[data['info'] == criterion].index)
         null_idx_list.extend(idx_list)
 
-    df_chill_days = file.loc[null_idx_list, :]
+    df_chill_days = data.loc[null_idx_list, :]
 
-    df_work_days = file.drop(index=df_chill_days.index).reset_index(drop=True)
+    df_work_days = data.drop(index=df_chill_days.index).reset_index(drop=True)
     df_work_days.loc[:, 'start_time'] = df_work_days.loc[df_work_days['start_time'].notna(), 'start_time'].apply(
         lambda x: str(x).split())
     df_work_days.loc[:, 'end_time'] = df_work_days.loc[df_work_days['end_time'].notna(), 'end_time'].apply(
         lambda x: str(x).split())
 
     df_work_days.to_csv('data/total_data/1_prepared.csv')
+
+    return
+
+
+def object_names_to_list(data):
+    ''' Формируем список всех уникальных объектов из собранных данных
+
+    :param data: pandas dataframe, содержащий все заявки с указанием наименований объектов
+    :return: .csv файл
+    '''
+    obj_list = list()
+    data['object'].apply(lambda x: obj_list.append(str(x).strip()) if str(x) != 'nan' else None)
+
+    df_objects = pd.DataFrame({'object_name': list(set(obj_list))})
+
+    df_objects.to_csv('data/total_data/df_objects.csv')
+    # print(df_objects.sort_values('object_name', ascending=True))
+    # print(set(obj_list))
+    return
+
+
+def main():
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        file1 = pd.read_csv('data/total_data/csv/0_total_table.csv', index_col=0)
+        file2 = pd.read_csv('data/total_data/csv/2_after_knn.csv', index_col=0)
+
+    # main_preparation(file1)
+    object_names_to_list(file2)
+
     return
 
 

@@ -28,20 +28,23 @@ with warnings.catch_warnings():
 # print(file3.info())
 # print(file4.info())
 # print(file3.describe())
-# print(file4.describe())
+# print(file4.describe())   
 
 ''' Блок 3. Агрегация данных
 '''
-
+f = file['object'].apply(lambda x: x if '113' in str(x) else pd.NA)
+for i in range(len(f)):
+    print(file.loc[i, ['object', 'requester']]) if '113' in str(f[i]) else None
+# print(f.info())
 
 ''' Блок 4. Визуализация данных
 '''
 
 ''' Блок 5. Проверка
 '''
-f = file.loc[file['requester'] == '', ['object', 'info']]
-
-print(f)
+# f = file.loc[file['requester'] == '', ['object', 'info']]
+#
+# print(f)
 
 # for i in file['info']:
 #     if '' in i:
