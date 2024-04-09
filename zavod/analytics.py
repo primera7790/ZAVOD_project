@@ -17,7 +17,8 @@ with warnings.catch_warnings():
     file = pd.read_csv('data/total_data/csv/2_after_knn.csv', index_col=0)
     file2 = pd.read_csv('data/total_data/csv/requesters.csv', index_col=0)
     file3 = pd.read_csv('data/total_data/csv/1_prepared.csv', index_col=0)
-    # file4 = pd.read_csv('data/total_data/1_prepared.csv', index_col=0)
+    file4 = pd.read_csv('data/total_data/csv/obj_split_names.csv', index_col=0)
+    obj_features = pd.read_csv('data/total_data/csv/obj_features.csv', index_col=None, header=None)
 
 ''' Блок 2. Сравнение между файлами
 '''
@@ -28,13 +29,13 @@ with warnings.catch_warnings():
 # print(file3.info())
 # print(file4.info())
 # print(file3.describe())
-# print(file4.describe())   
+# print(file4.describe())
 
 ''' Блок 3. Агрегация данных
 '''
-f = file['object'].apply(lambda x: x if '113' in str(x) else pd.NA)
-for i in range(len(f)):
-    print(file.loc[i, ['object', 'requester']]) if '113' in str(f[i]) else None
+# f = file['object'].apply(lambda x: x if '113' in str(x) else pd.NA)
+# for i in range(len(f)):
+#     print(file.loc[i, ['object', 'requester']]) if '113' in str(f[i]) else None
 # print(f.info())
 
 ''' Блок 4. Визуализация данных
@@ -42,6 +43,8 @@ for i in range(len(f)):
 
 ''' Блок 5. Проверка
 '''
+print(file4.info())
+
 # f = file.loc[file['requester'] == '', ['object', 'info']]
 #
 # print(f)
