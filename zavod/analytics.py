@@ -7,7 +7,7 @@ import re
 import math
 import numpy as np
 import pandas as pd
-from tqdm.auto import tqdm
+
 
 
 ''' Блок 1. Необходимые файлы

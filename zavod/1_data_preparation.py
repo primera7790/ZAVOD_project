@@ -9,6 +9,7 @@ def main_preparation(data):
     :param data: pandas dataframe, содержащий собранные данные без обработки
     :return: .csv file
     '''
+
     data.loc[data['max_power'] == data['max_power'].max(), ['max_power', 'min_power', 'power_per_24_hours']] = 77, 80, 1914
 
     while data['power_per_24_hours'].max() > 3000:
@@ -51,6 +52,7 @@ def object_names_to_list(data):
     :param data: pandas dataframe, содержащий все заявки с указанием наименований объектов
     :return: .csv файл
     '''
+
     obj_list = list()
     data['object'].apply(lambda x: obj_list.append(str(x).strip()) if str(x).strip() not in ('nan', '') else None)
 

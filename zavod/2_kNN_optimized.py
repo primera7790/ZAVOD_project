@@ -2,7 +2,6 @@ import warnings
 
 import numpy as np
 import pandas as pd
-from tqdm.auto import tqdm
 
 
 def comparing(text, target_name):
@@ -12,6 +11,7 @@ def comparing(text, target_name):
     :param target_name: str, фамилия одного из потенциальных заявителей
     :return: int, максимальное значение комбинации символов
     '''
+
     max_combo = 0
     count_step = 0
     count_hit = 0
@@ -57,6 +57,7 @@ def knn_algo(data, requesters_data):
     :param requesters_data: pandas dataframe, содержащий фамилии потенциальных заявителей
     :return: .csv файл
     '''
+
     info_data = data['info'].apply(lambda x: x[:90] if len(x) > 100 else x[:50])
     targets_data = requesters_data['requester_name']
 

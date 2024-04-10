@@ -16,6 +16,7 @@ def data_filter(dirty_data: list, date_name=False, time=False):
     :param time: bool, если dirty_data имеет вид [время,]
     :return: list, содержащий нормированные данные
     '''
+
     filtered_data = dirty_data.copy()
     if date_name is True:
         filtered_data[0] = filtered_data[0] if filtered_data[0][-1] != '.' else filtered_data[0][:-1]
@@ -57,6 +58,7 @@ def data_normalize(data_before_norm: list):
     :param data_before_norm: list, список вида [день, месяц, год]
     :return: list, список с корректными данными
     '''
+
     y = data_before_norm.copy()
     if len(y[2]) == 2:
         y[2] = '20' + y[2]
@@ -77,6 +79,7 @@ def data_mining(total_data, dir_path):
     > Пофайловый сбор информации
     
     '''
+
     names_in_dir = os.listdir(dir_path)
     for name in tqdm(names_in_dir):
         with warnings.catch_warnings():

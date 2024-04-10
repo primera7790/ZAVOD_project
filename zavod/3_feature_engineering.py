@@ -1,29 +1,22 @@
-import os
-import sys
 import warnings
-from pathlib import Path
 
-import re
-import math
-import numpy as np
 import pandas as pd
-from tqdm.auto import tqdm
 from collections import defaultdict
 
 
-def to_objects_split(data, train=False, test=False):
+def to_objects_split(data, train=False, prod=False):
     ''' Подготовка данных для дальнейшего признакового анализа
 
     :param data: pandas dataframe, содержащий перечень объектов и их принадлежность к конкретному производству
     :param train: bool, если подготавливаем данные для обучения - True
-    :param test: bool, если подготавливаем данные для предсказания - True
+    :param prod: bool, если подготавливаем данные для предсказания - True
     :return: .csv file
     '''
     to_correct_list = ['Об.', 'об.', 'Отд.', 'отд.', 'Кор.', 'кор.', 'к.', 'К.', 'Отд']
 
     if train:
         new_file = pd.DataFrame(columns=['object', 'manufacture'])
-    elif test:
+    elif prod:
         new_file = pd.DataFrame(columns=['object'])
 
     for obj_idx in range(len(data['object_name'])):
@@ -44,22 +37,22 @@ def to_objects_split(data, train=False, test=False):
 
             if train:
                 new_file.loc[len(new_file.index), ['object', 'manufacture']] = [el, data.iloc[obj_idx, 1]]
-            elif test:
+            elif prod:
                 new_file.loc[len(new_file.index), 'object'] = el
 
     if train:
         new_file.drop_duplicates().to_csv('data/total_data/obj_split_names.csv')
-    elif test:
+    elif prod:
         new_file.drop_duplicates().to_csv('data/total_data/obj_split_names_from_data.csv')
 
 
-def feature_engineering(data, features, train=False, test=False):
+def feature_engineering(data, features, train=False, prod=False):
     ''' Превращаем данные в набор признаков
 
     :param data: pandas dataframe, содержащий подготовленные объекты
     :param features: pandas dataframe, являющийся перечнем желаемых признаков
     :param train: bool, если подготавливаем данные для обучения - True
-    :param test: bool, если подготавливаем данные для предсказания - True
+    :param prod: bool, если подготавливаем данные для предсказания - True
     :return: .csv файл
     '''
     ''' 
@@ -68,6 +61,7 @@ def feature_engineering(data, features, train=False, test=False):
     :param features: pandas dataframe, являющийся перечнем желаемых признаков
     :return: .csv файл
     '''
+
     def for_each_object(obj_name, futures_num):
         ''' Проходимся по имени объекта и формируем все признаки
 
@@ -139,7 +133,7 @@ def feature_engineering(data, features, train=False, test=False):
 
     if train:
         features_data.to_csv('data/total_data/features_train.csv')
-    elif test:
+    elif prod:
         features_data.to_csv('data/total_data/features_test.csv')
 
     return
@@ -156,8 +150,8 @@ def main():
 
         obj_features = pd.read_csv('data/total_data/csv/obj_features.csv', index_col=0, header=None)
 
-    to_objects_split(obj_unique_from_data_file, test=True)
-    # feature_engineering(obj_split_names_from_data_file, obj_features, test=True)
+    # to_objects_split(obj_unique_from_data_file, test=True)
+    feature_engineering(obj_split_names_from_data_file, obj_features, prod=True)
 
 
 if __name__ == '__main__':
