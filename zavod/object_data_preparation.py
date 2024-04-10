@@ -11,14 +11,21 @@ from tqdm.auto import tqdm
 from collections import defaultdict
 
 
-def to_objects_split(data):
+def to_objects_split(data, train=False, test=False):
     ''' Подготовка данных для дальнейшего признакового анализа
 
     :param data: pandas dataframe, содержащий перечень объектов и их принадлежность к конкретному производству
+    :param train: bool, если подготавливаем данные для обучения - True
+    :param test: bool, если подготавливаем данные для предсказания - True
     :return: .csv file
     '''
-    to_correct_list = ['Об.', 'об.', 'Отд.', 'отд.', 'Кор.', 'кор.', 'к.', 'К.']
-    new_file = pd.DataFrame(columns=['object', 'manufacture'])
+    to_correct_list = ['Об.', 'об.', 'Отд.', 'отд.', 'Кор.', 'кор.', 'к.', 'К.', 'Отд']
+
+    if train:
+        new_file = pd.DataFrame(columns=['object', 'manufacture'])
+    elif test:
+        new_file = pd.DataFrame(columns=['object'])
+
     for obj_idx in range(len(data['object_name'])):
         text = str(data.iloc[obj_idx, 0])
 
@@ -31,11 +38,19 @@ def to_objects_split(data):
         ''' Пункт 2. Сплитуем текст объектов с сохранением привязки к конкретному производству
         '''
         split_list = text.split(' ')
-        for el in split_list:
-            new_file.loc[len(new_file.index), ['object', 'manufacture']] = [el, data.iloc[obj_idx, 1]]
+        split_list = [s for s in split_list if s and s not in ('nan', '', '\n')]
 
-    new_file.drop_duplicates().to_csv('data/total_data/split_objects.csv')
-    # print(split_list)
+        for el in split_list:
+
+            if train:
+                new_file.loc[len(new_file.index), ['object', 'manufacture']] = [el, data.iloc[obj_idx, 1]]
+            elif test:
+                new_file.loc[len(new_file.index), 'object'] = el
+
+    if train:
+        new_file.drop_duplicates().to_csv('data/total_data/obj_split_names.csv')
+    elif test:
+        new_file.drop_duplicates().to_csv('data/total_data/obj_split_names_from_data.csv')
 
 
 def feature_engineering(data, features, train=False, test=False):
@@ -60,6 +75,7 @@ def feature_engineering(data, features, train=False, test=False):
         :param futures_num: int, количество параметров
         :return: list, список, содержащий значения признаков
         '''
+        obj_name = str(obj_name)
         symbols_count = len(obj_name)
         figures_count = 0
         letters_count = 0
@@ -133,11 +149,15 @@ def main():
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         obj_names_file = pd.read_csv('data/total_data/csv/obj_names.csv', index_col=0)
+        obj_unique_from_data_file = pd.read_csv('data/total_data/csv/obj_unique_from_data.csv', index_col=0)
+
         obj_split_names_file = pd.read_csv('data/total_data/csv/obj_split_names.csv', index_col=0)
+        obj_split_names_from_data_file = pd.read_csv('data/total_data/csv/obj_split_names_from_data.csv', index_col=0)
+
         obj_features = pd.read_csv('data/total_data/csv/obj_features.csv', index_col=0, header=None)
 
-    # to_objects_split(obj_names_file)
-    feature_engineering(obj_split_names_file, obj_features, train=True)
+    to_objects_split(obj_unique_from_data_file, test=True)
+    # feature_engineering(obj_split_names_from_data_file, obj_features, test=True)
 
 
 if __name__ == '__main__':

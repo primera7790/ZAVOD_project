@@ -52,24 +52,23 @@ def object_names_to_list(data):
     :return: .csv файл
     '''
     obj_list = list()
-    data['object'].apply(lambda x: obj_list.append(str(x).strip()) if str(x) != 'nan' else None)
+    data['object'].apply(lambda x: obj_list.append(str(x).strip()) if str(x).strip() not in ('nan', '') else None)
 
     df_objects = pd.DataFrame({'object_name': list(set(obj_list))})
 
-    df_objects.to_csv('data/total_data/df_objects.csv')
-    # print(df_objects.sort_values('object_name', ascending=True))
-    # print(set(obj_list))
+    df_objects.to_csv('data/total_data/obj_unique_from_data.csv')
+
     return
 
 
 def main():
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        file1 = pd.read_csv('data/total_data/csv/0_total_table.csv', index_col=0)
-        file2 = pd.read_csv('data/total_data/csv/2_after_knn.csv', index_col=0)
+        total_table_file = pd.read_csv('data/total_data/csv/0_total_table.csv', index_col=0)
+        after_knn_file = pd.read_csv('data/total_data/csv/2_after_knn.csv', index_col=0)
 
-    # main_preparation(file1)
-    object_names_to_list(file2)
+    # main_preparation(total_table_file)
+    object_names_to_list(after_knn_file)
 
     return
 
