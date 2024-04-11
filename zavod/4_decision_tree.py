@@ -2,6 +2,7 @@ import warnings
 
 # import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.tree import DecisionTreeClassifier
 
 
@@ -20,15 +21,24 @@ def decision_tree(train_features, train_targets, on_prediction_features):
     model = DecisionTreeClassifier()
     model.fit(X, y)
 
-    test_data = X.loc[X.index == 0]
-    print(test_data)
-    print(train_features.loc[0, 'object'])
+    # test_data = X.loc[X.index == 0]
 
-    test_prediction = model.predict(test_data)
-    print(test_prediction)
-    # test_prediction = pd.DataFrame(test_prediction)
+    test_prediction = model.predict(X)
 
-    # test_prediction.to_csv('data/total_data/test_pred.csv')
+    test_prediction = pd.DataFrame(test_prediction)
+
+    test_prediction.to_csv('data/total_data/test_pred.csv')
+
+
+    to_visual_data = pd.DataFrame(index=X.columns, columns=['imp'])
+    to_visual_data['imp'] = model.feature_importances_
+    to_visual_data = to_visual_data.sort_values('imp', ascending=False)
+
+    plt.bar(to_visual_data.index, to_visual_data['imp'])
+    plt.xticks(rotation=45)
+    plt.show()
+
+
 
     # predictions = model.predict(on_prediction_features)
 
