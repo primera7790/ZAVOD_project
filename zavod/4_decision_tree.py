@@ -21,28 +21,41 @@ def decision_tree(train_features, train_targets, on_prediction_features):
     model = DecisionTreeClassifier()
     model.fit(X, y)
 
-    # test_data = X.loc[X.index == 0]
+    test_data = X.loc[X.index == 96]
 
-    test_prediction = model.predict(X)
+    test_prediction = model.predict(test_data)
 
     test_prediction = pd.DataFrame(test_prediction)
 
     test_prediction.to_csv('data/total_data/test_pred.csv')
 
+    df_predict = pd.DataFrame(model.predict_proba(test_data), columns=[model.classes_]).T
+    print(df_predict)
+    print(train_features.loc[96, 'object'])
+    # to_visual_data = pd.DataFrame(index=X.columns, columns=['imp'])
+    # to_visual_data['imp'] = model.feature_importances_
+    # to_visual_data = to_visual_data.sort_values('imp', ascending=False)
 
-    to_visual_data = pd.DataFrame(index=X.columns, columns=['imp'])
-    to_visual_data['imp'] = model.feature_importances_
-    to_visual_data = to_visual_data.sort_values('imp', ascending=False)
-
-    plt.bar(to_visual_data.index, to_visual_data['imp'])
-    plt.xticks(rotation=45)
-    plt.show()
-
-
+    # plt.bar(to_visual_data.index, to_visual_data['imp'])
+    # plt.xticks(rotation=45)
+    # plt.show()
 
     # predictions = model.predict(on_prediction_features)
 
-    return
+    return test_prediction
+
+
+def accuracy(targets, predictions):
+    obj_num = len(targets)
+    loss_count = 0
+
+    for idx in range(obj_num):
+        loss_count += 1 if targets[idx] != predictions[idx] else 0
+
+    print(loss_count, obj_num, sep='\n')
+    total_accuracy = 1 - loss_count / obj_num
+
+    return total_accuracy
 
 
 def main():
@@ -50,9 +63,16 @@ def main():
         warnings.simplefilter('ignore')
         features_train_file = pd.read_csv('data/total_data/csv/features_train.csv', index_col=0)
         targets_train_file = pd.read_csv('data/total_data/csv/obj_split_names.csv', index_col=0)
-        features_test_file = pd.read_csv('data/total_data/csv/features_test.csv', index_col=0)
+        features_prod_file = pd.read_csv('data/total_data/csv/features_prod.csv', index_col=0)
 
-    decision_tree(features_train_file, targets_train_file, features_test_file)
+    dt_predictions = decision_tree(features_train_file, targets_train_file, features_prod_file)
+
+    targets_train_file = targets_train_file.reset_index(drop=True)
+    dt_predictions = dt_predictions.reset_index(drop=True)
+
+    # total_accuracy = accuracy(targets_train_file['manufacture'], dt_predictions.iloc[:, 0])
+    print(dt_predictions.iloc[0, 0])
+    # print(f'Accuracy: {total_accuracy}')
 
 
 if __name__ == '__main__':

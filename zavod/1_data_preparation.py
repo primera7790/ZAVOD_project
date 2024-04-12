@@ -54,7 +54,7 @@ def object_names_to_list(data):
     '''
 
     obj_list = list()
-    data['object'].apply(lambda x: obj_list.append(str(x).strip()) if str(x).strip() not in ('nan', '') else None)
+    data['object'].apply(lambda x: obj_list.append(str(x).strip()) if str(x).strip() not in ('nan', '', '\n') else None)
 
     df_objects = pd.DataFrame({'object_name': list(set(obj_list))})
 
