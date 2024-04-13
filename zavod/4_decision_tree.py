@@ -21,17 +21,22 @@ def decision_tree(train_features, train_targets, on_prediction_features):
     model = DecisionTreeClassifier()
     model.fit(X, y)
 
-    test_data = X.loc[X.index == 96]
+    # test_data = X.loc[X.index == 96]
+    test_data = X
 
     test_prediction = model.predict(test_data)
 
     test_prediction = pd.DataFrame(test_prediction)
 
-    test_prediction.to_csv('data/total_data/test_pred.csv')
+    # test_prediction.to_csv('data/total_data/test_pred.csv')
 
-    df_predict = pd.DataFrame(model.predict_proba(test_data), columns=[model.classes_]).T
-    print(df_predict)
-    print(train_features.loc[96, 'object'])
+    df_proba = pd.DataFrame(model.predict_proba(test_data), columns=model.classes_)
+    df_idx = pd.DataFrame(train_features.index)
+
+    total_proba = pd.concat([df_idx, df_proba], axis=1)
+    total_proba.to_csv('data/total_data/total_proba.csv')
+    # print(total_proba)
+    # print(train_features.loc[96, 'object'])
     # to_visual_data = pd.DataFrame(index=X.columns, columns=['imp'])
     # to_visual_data['imp'] = model.feature_importances_
     # to_visual_data = to_visual_data.sort_values('imp', ascending=False)
