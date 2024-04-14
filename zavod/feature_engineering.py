@@ -10,9 +10,9 @@ def to_objects_split(data, train=False, prod=False):
     :param data: pandas dataframe, содержащий перечень объектов и их принадлежность к конкретному производству
     :param train: bool, если подготавливаем данные для обучения - True
     :param prod: bool, если подготавливаем данные для предсказания - True
-    :return: .csv file
+    :return: pandas dataframe
     '''
-    to_correct_list = ['Об.', 'об.', 'Отд.', 'отд.', 'Кор.', 'кор.', 'к.', 'К.', 'Отд']
+    to_correct_list = ['Об.', 'об.', 'Отд.', 'отд.', 'Кор.', 'кор.', 'к.', 'К.', 'Отд', 'Цех']
 
     if train:
         new_file = pd.DataFrame(columns=['idx', 'object', 'manufacture'])
@@ -40,10 +40,14 @@ def to_objects_split(data, train=False, prod=False):
             elif prod:
                 new_file.loc[len(new_file.index), ['idx', 'object']] = [obj_idx, el]
 
-    if train:
-        new_file.drop_duplicates().to_csv('data/total_data/obj_split_names.csv', index=False)
-    elif prod:
-        new_file.drop_duplicates().to_csv('data/total_data/obj_split_names_from_data.csv', index=False)
+    new_file = new_file.drop_duplicates()
+
+    # if train:
+    #     new_file.to_csv('data/total_data/obj_split_names.csv', index=False)
+    # elif prod:
+    #     new_file.to_csv('data/total_data/obj_split_names_from_data.csv', index=False)
+
+    return new_file
 
 
 def feature_engineering(data, features, train=False, prod=False):
@@ -142,7 +146,7 @@ def feature_engineering(data, features, train=False, prod=False):
     elif prod:
         features_data.to_csv('data/total_data/features_prod.csv', index=False)
 
-    return
+    return features_data
 
 
 def main():
