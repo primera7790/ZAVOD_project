@@ -2,6 +2,7 @@ import warnings
 
 import pandas as pd
 from collections import defaultdict
+from transliterate import translit
 
 
 def to_objects_split(data, train=False, prod=False):
@@ -63,7 +64,7 @@ def feature_engineering(data, features, train=False, prod=False):
 
     :param data: pandas dataframe, содержащий подготовленные объекты
     :param features: pandas dataframe, являющийся перечнем желаемых признаков
-    :return: .csv файл
+    :return: pandas dataframe
     '''
 
     def for_each_object(obj_name, features_num):
@@ -82,45 +83,51 @@ def feature_engineering(data, features, train=False, prod=False):
         sym_dict = defaultdict(int)
         feature_values_list = [0] * features_num
 
-        for sym in obj_name:
-            sym_dict[sym.lower()] += 1
+        obj_name_low = obj_name.lower()
+        for sym in obj_name_low:
+            alphabet_ru = [chr(i) for i in range(ord('а'), ord('ё') + 1)]
+            alphabet_eng = [chr(i) for i in range(ord('a'), ord('z') + 1)]
+            alphabet_eng_edit = [i for i in alphabet_eng if i != 'i']
+            other_symbols = ['.', ',', '/', '-', 'i']
 
-            alphabet = [chr(i) for i in range(ord('а'), ord('я') + 1)]
-            other_symbols = ['.', ',', '/', '-']
+            if sym in alphabet_eng_edit:
+                sym = translit(sym, 'ru')
+
+            sym_dict[sym] += 1
 
             if sym.isdigit() and int(sym) in range(10):
                 figures_count += 1
                 figure_first = int(sym) if figures_count == 1 else figure_first
 
-            elif sym.lower() in alphabet:
+            elif sym in alphabet_ru:
                 letters_count += 1
 
             else:
                 other_symbols_count += 1
 
-            for l_idx in range(len(alphabet)):
-                if alphabet[l_idx] in sym_dict:
+            for l_idx in range(len(alphabet_ru)):
+                if alphabet_ru[l_idx] in sym_dict:
                     feature_values_list[17 + l_idx] = 1
-                    feature_values_list[63 + l_idx] = sym_dict[alphabet[l_idx]]
+                    feature_values_list[66 + l_idx] = sym_dict[alphabet_ru[l_idx]]
                 else:
                     feature_values_list[17 + l_idx] = 0
-                    feature_values_list[63 + l_idx] = 0
+                    feature_values_list[66 + l_idx] = 0
 
             for f in range(10):
                 if str(f) in sym_dict:
                     feature_values_list[7 + f] = 1
-                    feature_values_list[53 + f] = sym_dict[str(f)]
+                    feature_values_list[56 + f] = sym_dict[str(f)]
                 else:
                     feature_values_list[7 + f] = 0
-                    feature_values_list[53 + f] = 0
+                    feature_values_list[56 + f] = 0
 
             for s_idx in range(len(other_symbols)):
                 if other_symbols[s_idx] in sym_dict:
-                    feature_values_list[49 + s_idx] = 1
-                    feature_values_list[95 + s_idx] = sym_dict[other_symbols[s_idx]]
+                    feature_values_list[51 + s_idx] = 1
+                    feature_values_list[100 + s_idx] = sym_dict[other_symbols[s_idx]]
                 else:
-                    feature_values_list[49 + s_idx] = 0
-                    feature_values_list[95 + s_idx] = 0
+                    feature_values_list[51 + s_idx] = 0
+                    feature_values_list[100 + s_idx] = 0
 
             feature_values_list[1] = obj_name
             feature_values_list[2] = symbols_count
@@ -133,13 +140,15 @@ def feature_engineering(data, features, train=False, prod=False):
 
     features_data = pd.DataFrame(columns=features.index)
 
+    to_features = data['object'].apply(lambda x: for_each_object(x, len(features.index)))
 
-    to_futures = data['object'].apply(lambda x: for_each_object(x, len(features.index)))
-
-    for line in to_futures:
+    for line in to_features:
         features_data.loc[len(features_data.index), :] = line
 
     features_data['idx'] = data.index
+
+    del features_data['pass1']
+    del features_data['pass2']
 
     if train:
         features_data.to_csv('data/total_data/features_train.csv', index=False)

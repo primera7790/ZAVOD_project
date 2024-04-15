@@ -50,7 +50,7 @@ def object_names_to_list(data):
     ''' Формируем список всех уникальных объектов из собранных данных
 
     :param data: pandas dataframe, содержащий все заявки с указанием наименований объектов
-    :return: .csv файл
+    :return: pandas dataframe + .csv файл
     '''
 
     obj_list = list()
@@ -60,7 +60,7 @@ def object_names_to_list(data):
 
     df_objects.to_csv('data/total_data/obj_unique_from_data.csv')
 
-    return
+    return df_objects
 
 
 def main():

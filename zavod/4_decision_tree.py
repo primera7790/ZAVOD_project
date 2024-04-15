@@ -7,29 +7,33 @@ import matplotlib.pyplot as plt
 from sklearn.tree import DecisionTreeClassifier
 
 import feature_engineering
+import data_preparation
 
 
 def decision_tree(train_data, prod_data, features):
     ''' Обучаем модель и предсказываем целевые значения
 
     :param train_data: pandas dataframe, содержащий перечень объектов и их принадлежность к конкретному производству
-    :param prod_data: pandas dataframe, содержащий перечень объектов среди собранных данных
+    :param prod_data: pandas dataframe, содержащий построчно все объекты из собранных данных
     :param features: pandas dataframe, являющийся перечнем признаков
     :return: pandas dataframe и 2 .csv файла
     '''
-    '''
-    train_features - features_train.csv
-    train_targets - obj_split_names.csv['manufacture']
-    on_prediction_features - features_prod.csv
-    unique_objects - obj_unique_from_data.csv
-    '''
 
+    # prod_data_unique = data_preparation.object_names_to_list(prod_data)  # опционально
+
+    ''' ПОДГОТОВКА ДАННЫХ. Разделяем текст имени объектов, избавляемся от неинформативных элементов
+    '''
     train_split_data = feature_engineering.to_objects_split(train_data, train=True)
     train_split_data.index = train_split_data['idx']
 
     prod_split_data = feature_engineering.to_objects_split(prod_data, prod=True)
     prod_split_data.index = prod_split_data['idx']
 
+    # prod_split_data_unique = feature_engineering.to_objects_split(prod_data_unique, prod=True)  # опционально
+    # prod_split_data_unique.index = prod_split_data_unique['idx']
+
+    ''' ПОДГОТОВКА ДАННЫХ. Разбиваем элементы имен объектов на признаки
+    '''
     feature_train_data = feature_engineering.feature_engineering(train_split_data, features, train=True)
     feature_train_data.index = feature_train_data['idx']
     del feature_train_data['idx']
@@ -38,24 +42,17 @@ def decision_tree(train_data, prod_data, features):
     feature_prod_data.index = feature_prod_data['idx']
     del feature_prod_data['idx']
 
-    # print(train_split_data)
-    # exit()
-
-
+    ''' ОБУЧЕНИЕ МОДЕЛИ
+    '''
     X = feature_train_data.iloc[:, 1:]
     y = train_split_data.loc[:, ['manufacture']]
 
     model = DecisionTreeClassifier()
     model.fit(X, y)
 
-    # test_data = X.loc[X.index == 96]
+    ''' ПРЕДСКАЗАНИЕ ЗНАЧЕНИЙ
+    '''
     to_predict_data = feature_prod_data.iloc[:, 1:]
-
-    # test_prediction = model.predict(test_data)
-
-    # test_prediction = pd.DataFrame(test_prediction)
-
-    # test_prediction.to_csv('data/total_data/test_pred.csv')
 
     df_proba = pd.DataFrame(model.predict_proba(to_predict_data), columns=model.classes_)
     df_idx = pd.DataFrame(to_predict_data.index)
@@ -65,14 +62,20 @@ def decision_tree(train_data, prod_data, features):
     total_prediction = prod_data
     total_prediction['prediction'] = 'Завод'
 
+    ''' КОРРЕКТИРОВКА ПРЕДСКАЗАНИЙ
+    '''
     for_analize = pandas.DataFrame(columns=dirty_proba.columns)
     idxs = list()
 
     for idx in range(dirty_proba['idx'].max() + 1):
         obj_proba = dirty_proba.loc[dirty_proba['idx'] == idx]
-
+        # print(idx)
+        # print(prod_data.loc[prod_data.index == idx])
         if len(obj_proba.index) > 1:
             sum_proba = np.sum(obj_proba, axis=0).to_numpy()
+        elif len(obj_proba.index) == 0:
+            sum_proba = [0] * 10
+            sum_proba[2] = 10
         else:
             sum_proba = obj_proba.values[0]
 
@@ -110,26 +113,35 @@ def decision_tree(train_data, prod_data, features):
 
     total_proba['idx'] = total_proba['idx'].apply(int)
 
-
-    total_proba.to_csv('data/total_data/total_proba.csv', index=False)
-    total_prediction.to_csv('data/total_data/total_prediction.csv')
-
+    # ''' ВИЗУАЛИЗАЦИЯ
+    # '''
     # print(dirty_proba)
-    # print(train_features.loc[96, 'object'])
-    # to_visual_data = pd.DataFrame(index=X.columns, columns=['imp'])
-    # to_visual_data['imp'] = model.feature_importances_
-    # to_visual_data = to_visual_data.sort_values('imp', ascending=False)
+    # print(feature_train_data.loc[96, 'object'])
+    to_visual_data = pd.DataFrame(index=X.columns, columns=['imp'])
+    to_visual_data['imp'] = model.feature_importances_
+    to_visual_data = to_visual_data.sort_values('imp', ascending=False)
 
-    # plt.bar(to_visual_data.index, to_visual_data['imp'])
-    # plt.xticks(rotation=45)
-    # plt.show()
+    plt.bar(to_visual_data.index, to_visual_data['imp'])
+    plt.xticks(rotation=45)
+    plt.show()
 
     # predictions = model.predict(on_prediction_features)
+
+    ''' ЗАВЕРШЕНИЕ
+    '''
+    total_proba.to_csv('data/total_data/total_proba.csv', index=False)
+    total_prediction.to_csv('data/total_data/total_prediction.csv')
 
     return total_prediction
 
 
 def accuracy(targets, predictions):
+    ''' Замер точности предсказаний
+
+    :param targets: pandas series, реальные значения
+    :param predictions: pandas series, предсказанные значения
+    :return: int, значение точности предсказания [0, 1]
+    '''
     obj_num = len(targets)
     loss_count = 0
 
@@ -145,20 +157,24 @@ def accuracy(targets, predictions):
 def main():
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        features_train_file = pd.read_csv('data/total_data/csv/features_train.csv', index_col=0)
-        targets_train_file = pd.read_csv('data/total_data/csv/obj_split_names.csv', index_col=0)
-        features_prod_file = pd.read_csv('data/total_data/csv/features_prod.csv', index_col=0)
-        obj_unique_from_data = pd.read_csv('data/total_data/csv/obj_unique_from_data.csv', index_col=0)
+
         obj_names_data = pd.read_csv('data/total_data/csv/obj_names.csv', index_col=0)
+
+        after_knn_file = pd.read_csv('data/total_data/csv/2_after_knn.csv', index_col=0)
+        obj_unique_from_data = pd.read_csv('data/total_data/csv/obj_unique_from_data.csv', index_col=0)
+
         obj_features = pd.read_csv('data/total_data/csv/obj_features.csv', index_col=0, header=None)
 
-    # dt_predictions = decision_tree(features_train_file, targets_train_file['manufacture'], features_prod_file, obj_unique_from_data)
-    dt_predictions = decision_tree(obj_names_data, obj_unique_from_data, obj_features)
+        obj_from_prod = pd.DataFrame({'object_name': after_knn_file['object']})
+        # obj_from_prod = obj_unique_from_data
 
+    decision_tree(obj_names_data, obj_from_prod, obj_features)
+
+    # dt_predictions = decision_tree(obj_names_data, obj_from_prod, obj_features)
     # total_accuracy = accuracy(obj_names['manufacture'], dt_predictions.iloc[:, 1])
-
     # print(f'Accuracy: {total_accuracy}')
 
+    return
 
 if __name__ == '__main__':
     main()
