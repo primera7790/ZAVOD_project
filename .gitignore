@@ -1,5 +1,4 @@
 .idea/
-venv/
 zavod/data_vault/
 zavod/archive/env/
 lab.py
