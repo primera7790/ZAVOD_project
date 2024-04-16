@@ -14,12 +14,12 @@ import pandas as pd
 '''
 with warnings.catch_warnings():
     warnings.simplefilter('ignore')
-    file = pd.read_csv('data/total_data/csv/2_after_knn.csv', index_col=0)
-    # file2 = pd.read_csv('data/total_data/csv/requesters.csv', index_col=0)
+    file = pd.read_csv('data_vault/total_data/csv/0_raw_data.csv', index_col=0)
+    req = pd.read_csv('data_vault/total_data/csv/requesters.csv')
     # file3 = pd.read_csv('data/total_data/csv/1_prepared.csv', index_col=0)
     # file4 = pd.read_csv('data/total_data/csv/obj_split_names.csv', index_col=0)
     # obj_features = pd.read_csv('data/total_data/csv/obj_features.csv', index_col=None, header=None)
-    total_data = pd.read_csv('data/total_data/csv/3_total_data.csv', index_col=0)
+    total_data = pd.read_csv('data_vault/total_data/csv/4_total_data.csv', index_col=0)
 
 ''' Блок 2. Сравнение между файлами
 '''
@@ -34,14 +34,7 @@ with warnings.catch_warnings():
 
 ''' Блок 3. Агрегация данных
 '''
-masters_day = total_data['master_day']
-masters_night = total_data['master_night']
-masters = pd.concat([masters_day, masters_night], axis=0).drop_duplicates()
-masters.to_csv('data/total_data/masters.csv')
-print(masters_day.shape)
-print(masters_night.shape)
-print(masters.shape)
-print(masters.unique().shape)
+print(len(req['code_name'].drop_duplicates()))
 
 
 ''' Блок 4. Визуализация данных
@@ -85,6 +78,14 @@ print(masters.unique().shape)
 
 
 
+'''
+Всего строк: 5062
+Рабочих ситуаций: 4045
 
+Всего мастеров: 20
+Отмечено уникальных заявителей: 399
+
+Дней без заявок: 1017?
+'''
 
 

@@ -37,6 +37,8 @@ def decision_tree(feature_train_data, targets_data, feature_prod_data, obj_names
     total_prediction = obj_names_from_prod
     total_prediction['prediction'] = 'Завод'
 
+    dirty_proba.to_csv('data_vault/total_data/dirty_proba.csv')
+
     ''' КОРРЕКТИРОВКА ПРЕДСКАЗАНИЙ
     '''
     # for_analize = pandas.DataFrame(columns=dirty_proba.columns)
@@ -78,16 +80,16 @@ def decision_tree(feature_train_data, targets_data, feature_prod_data, obj_names
 
     total_proba['idx'] = total_proba['idx'].apply(int)
 
-    ''' ВИЗУАЛИЗАЦИЯ
-    '''
-
-    to_visual_data = pd.DataFrame(index=X.columns, columns=['imp'])
-    to_visual_data['imp'] = model.feature_importances_
-    to_visual_data = to_visual_data.sort_values('imp', ascending=False)
-
-    plt.bar(to_visual_data.index, to_visual_data['imp'])
-    plt.xticks(rotation=45)
-    plt.show()
+    # ''' ВИЗУАЛИЗАЦИЯ
+    # '''
+    #
+    # to_visual_data = pd.DataFrame(index=X.columns, columns=['imp'])
+    # to_visual_data['imp'] = model.feature_importances_
+    # to_visual_data = to_visual_data.sort_values('imp', ascending=False)
+    #
+    # plt.bar(to_visual_data.index, to_visual_data['imp'])
+    # plt.xticks(rotation=45)
+    # plt.show()
 
 
     ''' ЗАВЕРШЕНИЕ
@@ -121,23 +123,24 @@ def main():
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
 
-        obj_names_data = pd.read_csv('data/total_data/csv/obj_names.csv', index_col=0)
+        feature_train_data = pd.read_csv('data_vault/total_data/features_train.csv', index_col=0)
+        targets_data = pd.read_csv('data_vault/total_data/obj_split_names.csv', index_col=0)
+        feature_prod_data = pd.read_csv('data_vault/total_data/features_prod.csv', index_col=0)
+        after_knn = pd.read_csv('data_vault/total_data/2_after_knn.csv', index_col=0)
+        obj_names_from_prod = pd.DataFrame({'object_name': after_knn['object']})
 
-        after_knn_file = pd.read_csv('data/total_data/csv/2_after_knn.csv', index_col=0)
-        obj_unique_from_data = pd.read_csv('data/total_data/csv/obj_unique_from_data.csv', index_col=0)
+        # obj_unique_from_data = pd.read_csv('data/total_data/csv/obj_unique_from_data.csv', index_col=0)
 
-        obj_features = pd.read_csv('data/total_data/csv/obj_features.csv', index_col=0, header=None)
-
-        obj_from_prod = pd.DataFrame({'object_name': after_knn_file['object']})
         # obj_from_prod = obj_unique_from_data
 
-    # decision_tree(obj_names_data, obj_from_prod, obj_features)
+    decision_tree(feature_train_data, targets_data, feature_prod_data, obj_names_from_prod)
 
     # dt_predictions = decision_tree(obj_names_data, obj_from_prod, obj_features)
     # total_accuracy = accuracy(obj_names['manufacture'], dt_predictions.iloc[:, 1])
     # print(f'Accuracy: {total_accuracy}')
 
     return
+
 
 if __name__ == '__main__':
     main()
