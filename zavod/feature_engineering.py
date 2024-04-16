@@ -150,10 +150,10 @@ def feature_engineering(data, features, train=False, prod=False):
     del features_data['pass1']
     del features_data['pass2']
 
-    if train:
-        features_data.to_csv('data/total_data/features_train.csv', index=False)
-    elif prod:
-        features_data.to_csv('data/total_data/features_prod.csv', index=False)
+    # if train:
+    #     features_data.to_csv('data/total_data/features_train.csv', index=False)
+    # elif prod:
+    #     features_data.to_csv('data/total_data/features_prod.csv', index=False)
 
     return features_data
 

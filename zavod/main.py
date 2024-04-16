@@ -1,12 +1,7 @@
-# import os
 import warnings
 from pathlib import Path
 
-# import numpy as np
-# import pandas
 import pandas as pd
-# import matplotlib.pyplot as plt
-# from sklearn.tree import DecisionTreeClassifier
 
 import data_mining
 import data_preparation
@@ -35,6 +30,7 @@ def all_in(obj_names_data, obj_features, requesters_data):
     ''' СБОР ДАННЫХ
     '''
     excel_dir = Path(Path(__file__).parent, 'data/excel_dir')
+
     prod_data_table = data_mining.data_mining(df_total, excel_dir)
     print('2. ОБРАБОТКА И НОРМАЛИЗАЦИЯ ДАННЫХ')
 
@@ -53,6 +49,7 @@ def all_in(obj_names_data, obj_features, requesters_data):
     Легкие правки (файл скрыт по причине наличия персональных данных)
     '''
     after_knn_data = hide_correction.hide_correction(after_knn_data)
+
     print('5. ПОДГОТОВКА ДАННЫХ ДЛЯ АЛГОРИТМА ДЕРЕВА РЕШЕНИЙ')
 
     ''' ПОДГОТОВКА ДАННЫХ ДЛЯ АЛГОРИТМА ДЕРЕВА РЕШЕНИЙ
@@ -98,7 +95,7 @@ def all_in(obj_names_data, obj_features, requesters_data):
                                   'start_time', 'end_time', 'info', 'master_day', 'master_night', 'max_power',
                                   'min_power', 'power_per_24_hours', 'power_supply_scheme', 'file_name']]
 
-    prod_data.to_csv('data/total_data/prod_data.csv')
+    prod_data.to_csv('data/total_data/total_data.csv')
     print('ГОТОВО')
 
     return

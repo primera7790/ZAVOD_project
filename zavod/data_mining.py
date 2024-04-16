@@ -248,7 +248,7 @@ def data_mining(total_data, dir_path):
 
             count_line += 1
 
-    # total_data.to_csv('data/total_data/total.csv')
+    # total_data.to_csv('data/total_data/0_raw_data.csv')
 
     return total_data
 

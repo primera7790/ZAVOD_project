@@ -1,13 +1,10 @@
 import warnings
 
 import numpy as np
-import pandas
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.tree import DecisionTreeClassifier
 
-import feature_engineering
-import data_preparation
+from sklearn.tree import DecisionTreeClassifier
 
 
 def decision_tree(feature_train_data, targets_data, feature_prod_data, obj_names_from_prod):
@@ -81,24 +78,22 @@ def decision_tree(feature_train_data, targets_data, feature_prod_data, obj_names
 
     total_proba['idx'] = total_proba['idx'].apply(int)
 
-    # ''' ВИЗУАЛИЗАЦИЯ
-    # '''
-    # print(dirty_proba)
-    # print(feature_train_data.loc[96, 'object'])
-    # to_visual_data = pd.DataFrame(index=X.columns, columns=['imp'])
-    # to_visual_data['imp'] = model.feature_importances_
-    # to_visual_data = to_visual_data.sort_values('imp', ascending=False)
-    #
-    # plt.bar(to_visual_data.index, to_visual_data['imp'])
-    # plt.xticks(rotation=45)
-    # plt.show()
+    ''' ВИЗУАЛИЗАЦИЯ
+    '''
 
-    # predictions = model.predict(on_prediction_features)
+    to_visual_data = pd.DataFrame(index=X.columns, columns=['imp'])
+    to_visual_data['imp'] = model.feature_importances_
+    to_visual_data = to_visual_data.sort_values('imp', ascending=False)
+
+    plt.bar(to_visual_data.index, to_visual_data['imp'])
+    plt.xticks(rotation=45)
+    plt.show()
+
 
     ''' ЗАВЕРШЕНИЕ
     '''
-    total_proba.to_csv('data/total_data/total_proba.csv', index=False)
-    total_prediction.to_csv('data/total_data/total_prediction.csv')
+    # total_proba.to_csv('data/total_data/total_proba.csv', index=False)
+    # total_prediction.to_csv('data/total_data/total_prediction.csv')
 
     return total_prediction
 

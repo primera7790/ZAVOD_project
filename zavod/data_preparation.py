@@ -28,7 +28,11 @@ def main_preparation(data):
                            'Неисправностей, отказа электрооборудования, сетей электроснабжения не было', 'отказа электрооборудования, сетей электроснабжения небыло.',
                            'отказа электрооборудования, сетей электроснабжения- нет', 'Неисправности ,отказа электрооборудования не было.']
 
+    for col in data.columns[2:]:
+        data[col] = data[col].apply(lambda x: pd.NA if str(x).strip() == '' else x)
+
     null_idx_list = list(data.loc[data['info'].isnull()].index)
+
     for criterion in null_criterion_list:
         idx_list = list(data.loc[data['info'] == criterion].index)
         null_idx_list.extend(idx_list)
@@ -58,7 +62,7 @@ def object_names_to_list(data):
 
     df_objects = pd.DataFrame({'object_name': list(set(obj_list))})
 
-    df_objects.to_csv('data/total_data/obj_unique_from_data.csv')
+    # df_objects.to_csv('data/total_data/obj_unique_from_data.csv')
 
     return df_objects
 
@@ -66,11 +70,12 @@ def object_names_to_list(data):
 def main():
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        total_table_file = pd.read_csv('data/total_data/csv/0_total_table.csv', index_col=0)
+        total_table_file = pd.read_csv('data/total_data/csv/0_raw_data.csv', index_col=0)
         after_knn_file = pd.read_csv('data/total_data/csv/2_after_knn.csv', index_col=0)
+        total = pd.read_csv('data/total_data/total.csv', index_col=0)
 
-    # main_preparation(total_table_file)
-    object_names_to_list(after_knn_file)
+    main_preparation(total)
+    # object_names_to_list(after_knn_file)
 
     return
 
