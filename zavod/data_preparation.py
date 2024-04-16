@@ -7,7 +7,7 @@ def main_preparation(data):
     ''' Корректировка и стандартизация данных, переданных сразу после сбора
 
     :param data: pandas dataframe, содержащий собранные данные без обработки
-    :return: .csv file
+    :return: pandas dataframe
     '''
 
     data.loc[data['max_power'] == data['max_power'].max(), ['max_power', 'min_power', 'power_per_24_hours']] = 77, 80, 1914
@@ -41,9 +41,9 @@ def main_preparation(data):
     df_work_days.loc[:, 'end_time'] = df_work_days.loc[df_work_days['end_time'].notna(), 'end_time'].apply(
         lambda x: str(x).split())
 
-    df_work_days.to_csv('data/total_data/1_prepared.csv')
+    # df_work_days.to_csv('data/total_data/1_prepared.csv')
 
-    return
+    return df_work_days
 
 
 def object_names_to_list(data):

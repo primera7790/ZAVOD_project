@@ -71,7 +71,7 @@ def data_mining(total_data, dir_path):
 
     :param total_data: pandas dataframe, подготовленный для сбора данных
     :param dir_path: path, содержащий путь к директории с .xlsx файлами
-    :return: .csv файл
+    :return: pandas dataframe
     '''
 
     '''
@@ -248,9 +248,9 @@ def data_mining(total_data, dir_path):
 
             count_line += 1
 
-    total_data.to_csv('data/total_data/total.csv')
+    # total_data.to_csv('data/total_data/total.csv')
 
-    return
+    return total_data
 
 
 def main():
