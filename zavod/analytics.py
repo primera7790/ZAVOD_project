@@ -9,17 +9,17 @@ import numpy as np
 import pandas as pd
 
 
-
 ''' Блок 1. Необходимые файлы
 '''
 with warnings.catch_warnings():
     warnings.simplefilter('ignore')
-    file = pd.read_csv('data_vault/total_data/csv/0_raw_data.csv', index_col=0)
+    raw_data = pd.read_csv('data_vault/total_data/0_raw_data.csv', index_col=0)
     req = pd.read_csv('data_vault/total_data/csv/requesters.csv')
+    chill = pd.read_csv('data_vault/total_data/df_chill_days.csv', index_col=0)
     # file3 = pd.read_csv('data/total_data/csv/1_prepared.csv', index_col=0)
     # file4 = pd.read_csv('data/total_data/csv/obj_split_names.csv', index_col=0)
     # obj_features = pd.read_csv('data/total_data/csv/obj_features.csv', index_col=None, header=None)
-    total_data = pd.read_csv('data_vault/total_data/csv/4_total_data.csv', index_col=0)
+    total_data = pd.read_csv('data_vault/total_data/4_total_data.csv', index_col=0)
 
 ''' Блок 2. Сравнение между файлами
 '''
@@ -34,8 +34,17 @@ with warnings.catch_warnings():
 
 ''' Блок 3. Агрегация данных
 '''
-print(len(req['code_name'].drop_duplicates()))
+raw_data['date_day'] = pd.to_datetime(raw_data['date_day'])
+interval = raw_data['date_day'].max() - raw_data['date_day'].min()
 
+
+first_day = raw_data['date_day'].min()
+last_day = raw_data['date_day'].max()
+print(interval.days)
+
+analytics_data = pd.DataFrame(columns=[i for i in range(2017, 2025)] + ['total'])
+# analytics_data.loc[0] = 0
+print(analytics_data)
 
 ''' Блок 4. Визуализация данных
 '''
@@ -80,12 +89,20 @@ print(len(req['code_name'].drop_duplicates()))
 
 '''
 Всего строк: 5062
-Рабочих ситуаций: 4045
+Рабочих ситуаций: 4046
 
 Всего мастеров: 20
 Отмечено уникальных заявителей: 399
 
-Дней без заявок: 1017?
+Данные с: 2017-07-19
+Данные по: 2024-03-01
+Всего дней: 2416
+Дней с заявками: 1788
+Дней без заявок: 628
+Соотношение: 2.8 к 1, т.е. из каждых 4х дней на работе приходится 1 чиловый
+
+ПО ГОДАМ разбить на переменные и визуализировать
+
 '''
 
 

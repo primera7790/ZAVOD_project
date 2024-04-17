@@ -25,32 +25,32 @@ def all_in(obj_names_data, obj_features, requesters_data):
     df_total = pd.DataFrame(columns=['date_day', 'date_night', 'object', 'installation', 'start_time', 'end_time',
                                      'master_day', 'master_night', 'info', 'requester', 'max_power', 'min_power',
                                      'power_per_24_hours', 'power_supply_scheme', 'file_name'])
-    print('1. СБОР ДАННЫХ')
+    print('1. СБОР ДАННЫХ...')
 
     ''' СБОР ДАННЫХ
     '''
-    excel_dir = Path(Path(__file__).parent, 'data/excel_dir')
+    excel_dir = Path(Path(__file__).parent, 'data_vault/excel_dir')
 
     prod_data_table = data_mining.data_mining(df_total, excel_dir)
-    print('2. ОБРАБОТКА И НОРМАЛИЗАЦИЯ ДАННЫХ')
+    print('2. ОБРАБОТКА И НОРМАЛИЗАЦИЯ ДАННЫХ...')
 
     ''' ОБРАБОТКА И НОРМАЛИЗАЦИЯ ДАННЫХ
     '''
     prepared_data = data_preparation.main_preparation(prod_data_table)
-    print('3. ВЫЯВЛЯЕМ ЗАЯВИТЕЛЕЙ')
+    print('3. ВЫЯВЛЯЕМ ЗАЯВИТЕЛЕЙ...')
 
     ''' ВЫЯВЛЯЕМ ЗАЯВИТЕЛЯ 
     Используем kNN - метод ближайшего соседа
     '''
     after_knn_data = kNN_optimized.knn_algo(prepared_data, requesters_data)
-    print('4. КОРРЕКТИРОВКА ДАННЫХ')
+    print('4. КОРРЕКТИРОВКА ДАННЫХ...')
 
     ''' КОРРЕКТИРОВКА ДАННЫХ
     Легкие правки (файл скрыт по причине наличия персональных данных)
     '''
     after_knn_data = hide_correction.hide_correction(after_knn_data)
 
-    print('5. ПОДГОТОВКА ДАННЫХ ДЛЯ АЛГОРИТМА ДЕРЕВА РЕШЕНИЙ')
+    print('5. ПОДГОТОВКА ДАННЫХ ДЛЯ АЛГОРИТМА ДЕРЕВА РЕШЕНИЙ...')
 
     ''' ПОДГОТОВКА ДАННЫХ ДЛЯ АЛГОРИТМА ДЕРЕВА РЕШЕНИЙ
     Разделяем текст имени объектов, избавляемся от неинформативных элементов
@@ -66,7 +66,7 @@ def all_in(obj_names_data, obj_features, requesters_data):
 
     # prod_split_data_unique = feature_engineering.to_objects_split(obj_names_from_prod, prod=True)  # опционально
     # prod_split_data_unique.index = prod_split_data_unique['idx']
-    print('6. ПЕРЕВОД ИМЕН ОБЪЕКТОВ В ПРИЗНАКОВОЕ ПРОСТРАНСТВО')
+    print('6. ПЕРЕВОД ИМЕН ОБЪЕКТОВ В ПРИЗНАКОВОЕ ПРОСТРАНСТВО...')
 
     ''' ПЕРЕВОД ИМЕН ОБЪЕКТОВ В ПРИЗНАКОВОЕ ПРОСТРАНСТВО
     '''
@@ -77,7 +77,7 @@ def all_in(obj_names_data, obj_features, requesters_data):
     feature_prod_data = feature_engineering.feature_engineering(prod_split_data, obj_features, prod=True)
     feature_prod_data.index = feature_prod_data['idx']
     del feature_prod_data['idx']
-    print('7. КЛАССИФИКАЦИЯ ОБЪЕКТОВ ПО ПРОИЗВОДСТВАМ')
+    print('7. КЛАССИФИКАЦИЯ ОБЪЕКТОВ ПО ПРОИЗВОДСТВАМ...')
 
     ''' КЛАССИФИКАЦИЯ ОБЪЕКТОВ ПО ПРОИЗВОДСТВАМ
     Используем Decision tree
@@ -95,7 +95,7 @@ def all_in(obj_names_data, obj_features, requesters_data):
                                   'start_time', 'end_time', 'info', 'master_day', 'master_night', 'max_power',
                                   'min_power', 'power_per_24_hours', 'power_supply_scheme', 'file_name']]
 
-    prod_data.to_csv('data/total_data/total_data.csv')
+    # prod_data.to_csv('data_vault/total_data/4_total_data.csv')
     print('ГОТОВО')
 
     return
@@ -105,9 +105,9 @@ def main():
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
 
-        obj_names_data = pd.read_csv('data/total_data/csv/obj_names.csv', index_col=0)
-        obj_features = pd.read_csv('data/total_data/csv/obj_features.csv', index_col=0, header=None)
-        requesters_data = pd.read_csv('data/total_data/csv/requesters.csv')
+        obj_names_data = pd.read_csv('data_vault/total_data/csv/obj_names.csv', index_col=0)
+        obj_features = pd.read_csv('data_vault/total_data/csv/obj_features.csv', index_col=0, header=None)
+        requesters_data = pd.read_csv('data_vault/total_data/csv/requesters.csv')
 
         # after_knn_file = pd.read_csv('data/total_data/csv/2_after_knn.csv', index_col=0)
         # obj_unique_from_data = pd.read_csv('data/total_data/csv/obj_unique_from_data.csv', index_col=0)

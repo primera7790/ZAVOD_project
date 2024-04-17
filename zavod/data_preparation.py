@@ -45,6 +45,7 @@ def main_preparation(data):
     df_work_days.loc[:, 'end_time'] = df_work_days.loc[df_work_days['end_time'].notna(), 'end_time'].apply(
         lambda x: str(x).split())
 
+    # df_chill_days.to_csv('data_vault/total_data/df_chill_days.csv')
     # df_work_days.to_csv('data/total_data/1_prepared.csv')
 
     return df_work_days
@@ -70,9 +71,9 @@ def object_names_to_list(data):
 def main():
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        total_table_file = pd.read_csv('data/total_data/csv/0_raw_data.csv', index_col=0)
-        after_knn_file = pd.read_csv('data/total_data/csv/2_after_knn.csv', index_col=0)
-        total = pd.read_csv('data/total_data/total.csv', index_col=0)
+        # total_table_file = pd.read_csv('data/total_data/csv/0_raw_data.csv', index_col=0)
+        # after_knn_file = pd.read_csv('data/total_data/csv/2_after_knn.csv', index_col=0)
+        total = pd.read_csv('data_vault/total_data/0_raw_data.csv', index_col=0)
 
     main_preparation(total)
     # object_names_to_list(after_knn_file)
