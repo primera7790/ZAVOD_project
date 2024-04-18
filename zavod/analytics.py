@@ -54,6 +54,8 @@ def masters_count(data):
 def requesters_count(data):
     requesters = data['requester'].drop_duplicates().reset_index(drop=True)
     ans = len(requesters)
+    if 'не указан' in requesters.values:
+        ans -= 1
     return ans
 
 
@@ -184,8 +186,8 @@ req_on_rqst = req_on_rqst.rename(columns={'manufacture': 'total'})
 manufacture_data = pd.concat([manufacture_data, req_from_man], axis=1)
 requester_data = pd.concat([requester_data, req_on_rqst], axis=1)
 
-print(manufacture_data)
-print(requester_data)
+print(analytics_data)
+# print(requester_data)
 
 
 ''' Блок 4. Визуализация данных
@@ -206,14 +208,14 @@ print(requester_data)
 Рабочих ситуаций: 4046
 
 Всего мастеров: 20
-Отмечено уникальных заявителей: 399
+Отмечено уникальных заявителей: 429 как получилось 399 в первый раз?
 
 Данные с: 2017-07-19
 Данные по: 2024-03-01
-Всего рассмотрено дней: 2416?
-Дней с заявками: 1788
-Дней без заявок: 628
-Соотношение: 2.8 к 1, т.е. из каждых 4х дней на работе приходится 1 чиловый
+Всего рассмотрено дней: 2329
+Дней с заявками: 1701
+Дней без заявок: 791
+Соотношение: 2.15 к 1, т.е. из каждых 3х-4х дней на работе приходится 1 чиловый
 
 ПО ГОДАМ разбить на переменные и визуализировать
 
