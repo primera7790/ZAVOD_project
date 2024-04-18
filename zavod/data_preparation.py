@@ -45,6 +45,7 @@ def main_preparation(data):
     df_work_days.loc[:, 'end_time'] = df_work_days.loc[df_work_days['end_time'].notna(), 'end_time'].apply(
         lambda x: str(x).split())
 
+    # data.to_csv('data_vault/total_data/0_raw_prepared_data.csv')
     # df_chill_days.to_csv('data_vault/total_data/df_chill_days.csv')
     # df_work_days.to_csv('data/total_data/1_prepared.csv')
 
