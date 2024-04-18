@@ -38,6 +38,8 @@ total_data['date_day'] = pd.to_datetime(total_data['date_day'])
 chill_data['date_day'] = pd.to_datetime(chill_data['date_day'])
 
 analytics_data = pd.DataFrame(columns=[i for i in range(2017, 2025)] + ['total'])
+manufacture_data = pd.DataFrame(index=total_data['manufacture'].unique())
+requester_data = pd.DataFrame(index=total_data['requester'].unique())
 
 
 def masters_count(data):
@@ -85,7 +87,7 @@ def average_time(data):
                 diff = (end[t] - start[t]).total_seconds() / 60
                 diffs.append(diff)
 
-    average = np.average(diffs)
+    average = int(np.average(diffs) + 0.5)
     return average
 
 
@@ -138,6 +140,14 @@ for v in analytics_data.columns[:-1]:
     average_24h_power.append(pow24_v)
     average_job_time.append(av_time_v)
 
+    req_from_man_v = t_data.loc[:, ['manufacture', 'requester']].groupby('manufacture').count()
+    req_from_man_v = req_from_man_v.rename(columns={'requester': v})
+    req_on_rqst_v = t_data.loc[:, ['requester', 'manufacture']].groupby('requester').count()
+    req_on_rqst_v = req_on_rqst_v.rename(columns={'manufacture': v})
+
+    manufacture_data = pd.concat([manufacture_data, req_from_man_v], axis=1)
+    requester_data = pd.concat([requester_data, req_on_rqst_v], axis=1)
+
 strings_all.append(len(raw_data.index))
 requests_all.append(len(total_data.index))
 days_all.append(days_count(raw_data))
@@ -166,7 +176,16 @@ analytics_data.loc['average_min_power'] = average_min_power
 analytics_data.loc['average_24h_power'] = average_24h_power
 analytics_data.loc['average_job_time'] = average_job_time
 
-print(analytics_data)
+req_from_man = total_data.loc[:, ['manufacture', 'requester']].groupby('manufacture').count()
+req_from_man = req_from_man.rename(columns={'requester': 'total'})
+req_on_rqst = total_data.loc[:, ['requester', 'manufacture']].groupby('requester').count()
+req_on_rqst = req_on_rqst.rename(columns={'manufacture': 'total'})
+
+manufacture_data = pd.concat([manufacture_data, req_from_man], axis=1)
+requester_data = pd.concat([requester_data, req_on_rqst], axis=1)
+
+print(manufacture_data)
+print(requester_data)
 
 
 ''' Блок 4. Визуализация данных
