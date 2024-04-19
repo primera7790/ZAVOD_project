@@ -72,7 +72,7 @@ def knn_algo(data, requesters_data):
 
     data['requester'] = predictions_idx.apply(lambda x: targets_data[x])
 
-    # data.to_csv('data/total_data/2_after_knn.csv')
+    # data.to_csv('data_vault/total_data/2_after_knn.csv')
 
     return data
 

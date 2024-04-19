@@ -48,7 +48,7 @@ def all_in(obj_names_data, obj_features, requesters_data):
     ''' КОРРЕКТИРОВКА ДАННЫХ
     Легкие правки (файл скрыт по причине наличия персональных данных)
     '''
-    after_knn_data = hide_correction.hide_correction(after_knn_data)
+    after_knn_data = hide_correction.requesters_correction(after_knn_data)
 
     print('5. ПОДГОТОВКА ДАННЫХ ДЛЯ АЛГОРИТМА ДЕРЕВА РЕШЕНИЙ...')
 

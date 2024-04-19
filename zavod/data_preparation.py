@@ -1,6 +1,7 @@
 import warnings
 
 import pandas as pd
+import hide_correction
 
 
 def main_preparation(data):
@@ -37,6 +38,8 @@ def main_preparation(data):
         idx_list = list(data.loc[data['info'] == criterion].index)
         null_idx_list.extend(idx_list)
 
+    data = hide_correction.masters_correction(data)
+
     df_chill_days = data.loc[null_idx_list, :]
 
     df_work_days = data.drop(index=df_chill_days.index).reset_index(drop=True)
@@ -47,7 +50,7 @@ def main_preparation(data):
 
     # data.to_csv('data_vault/total_data/0_raw_prepared_data.csv')
     # df_chill_days.to_csv('data_vault/total_data/df_chill_days.csv')
-    # df_work_days.to_csv('data/total_data/1_prepared.csv')
+    # df_work_days.to_csv('data_vault/total_data/1_prepared.csv')
 
     return df_work_days
 
@@ -72,11 +75,11 @@ def object_names_to_list(data):
 def main():
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        # total_table_file = pd.read_csv('data/total_data/csv/0_raw_data.csv', index_col=0)
+        raw_data = pd.read_csv('data_vault/total_data/csv/0_raw_data.csv', index_col=0)
         # after_knn_file = pd.read_csv('data/total_data/csv/2_after_knn.csv', index_col=0)
         total = pd.read_csv('data_vault/total_data/0_raw_data.csv', index_col=0)
 
-    main_preparation(total)
+    main_preparation(raw_data)
     # object_names_to_list(after_knn_file)
 
     return
