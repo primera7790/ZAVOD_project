@@ -5,11 +5,16 @@ from pathlib import Path
 
 import re
 import math
+import squarify
 import numpy as np
 import pandas as pd
 from collections import defaultdict
 import matplotlib.pyplot as plt
 
+import plotly
+import plotly.graph_objs as go
+import plotly.express as px
+from plotly.subplots import make_subplots
 
 ''' Блок 1. Необходимые файлы
 '''
@@ -230,87 +235,368 @@ master_data = pd.DataFrame(index=masters_data['master_name'])
 
 # raw_prepared_data = raw_prepared_data.loc[raw_prepared_data.index % 4 == 0]
 # powers = raw_prepared_data[['date_day', 'power_per_24_hours']].dropna().sort_values('date_day').set_index('date_day')
-# # powers = powers[~powers.index.duplicated()].copy()
-# # powers.plot()
-# # plt.yticks(np.arange(0, 2201, 200))
-# # plt.show()  # мощность по годам
+# powers = powers[~powers.index.duplicated()].copy()
+# powers.plot()
+# plt.grid()
+# plt.yticks(np.arange(0, 2201, 200))
+# plt.show()  # мощность по годам
 
 # СВЯЗАННОЕ СО ВРЕМЕНЕМ
 
+# actual_data = total_data.loc[:, ['start_time']].dropna().reset_index(drop=True)
+#
+# time_list = list()
+#
+#
+# def to_list(data):
+#     times = pd.to_datetime(
+#         data
+#         .replace('[', '').replace(']', '').replace("'", '').replace(',', '')
+#         .split(' '), format='%H:%M'
+#     )
+#     for i in times:
+#         time = i.time()
+#         hours = time.hour
+#         minutes = time.minute
+#         if minutes >= 30:
+#             hours += 1 if hours != 23 else -23
+#
+#         time_list.append(hours)
+#     return
+#
+#
+# actual_data['start_time'].apply(lambda x: to_list(x))
+#
+# # print(time_list)
+#
+#
+# new_pd = pd.DataFrame(columns=['time', 'in'])
+# # new_pd['time'] = time_list
+# # new_pd['in'] = 1
+# # new_pd = new_pd.groupby('time').count()
+#
+# d = defaultdict(int)
+#
+# for i in time_list:
+#     d[i] += 1
+#
+# # print(sorted(d.items()))
+#
+# # plt.hist(time_list, bins=24, range=(0, 24))
+# # plt.xticks(np.arange(0, 24, 1))
+# # # plt.minorticks_on()
+# # plt.grid(which='major', linestyle=':')
+# # plt.grid(which='minor')
+# # plt.tight_layout()
+# num_list = list()
+# rep_list = list()
+# for j, k in sorted(d.items()):
+#     num_list.append(j)
+#     rep_list.append(k)
+#
+# num_list_day = num_list[8:21]
+# num_list_night = num_list[0:8] + num_list[20:]
+# rep_list_day = rep_list[8:21]
+# rep_list_night = rep_list[0:8] + rep_list[20:]
+#
+# # plt.bar(num_list_day, rep_list_day, color='darkorange')
+# # plt.bar(num_list_night, rep_list_night)
+# # plt.xticks(np.arange(0, 24, 1))
+# # plt.grid(which='major', axis='y')
+# # plt.show()
+# # print(new_pd)  # Количество начала работ в течение суток по времени
 
-actual_data = total_data.loc[:, ['start_time']].dropna().reset_index(drop=True)
-
-time_list = list()
-
-
-def to_list(data):
+def to_dict(data):
     times = pd.to_datetime(
         data
         .replace('[', '').replace(']', '').replace("'", '').replace(',', '')
         .split(' '), format='%H:%M'
     )
+
+    time_dict = defaultdict(int)
     for i in times:
         time = i.time()
         hours = time.hour
-        minutes = time.minute
-        if minutes >= 30:
-            hours += 1 if hours != 23 else -23
+        if hours >= 8 and hours < 20:
+            time_dict['day'] += 1
+        else:
+            time_dict['night'] += 1
 
-        time_list.append(hours)
-    return
+    return time_dict
+#
+#
+df_mas_total = master_data
+for v in analytics_data.columns[:-1]:
+    v = int(v)
+#
+    r_data = raw_data.loc[raw_data['date_day'].dt.year == v]
+    r_p_data = raw_prepared_data.loc[raw_prepared_data['date_day'].dt.year == v]
+    t_data = total_data.loc[total_data['date_day'].dt.year == v]
+    c_data = chill_data.loc[chill_data['date_day'].dt.year == v]
+    actual_data = t_data[['date_day', 'master_day', 'master_night']].set_index('date_day')
+    actual_data = actual_data[~actual_data.index.duplicated()].copy()
+    master_day_in_work = t_data.groupby('master_day').count()['master_night']
+    master_night_in_work = t_data.groupby('master_night').count()['master_day']
+    master_in_work = pd.concat([master_data, master_day_in_work, master_night_in_work], axis=1, join='outer').fillna(0)
+    master_in_work['work_days'] = master_in_work['master_night'] + master_in_work['master_day']
+
+    master_in_work = master_in_work[['work_days']]
+
+    actual_data_dropna = t_data.loc[:, ['start_time']].dropna()
+    actual_data = t_data.loc[actual_data_dropna.index, ['start_time', 'master_day', 'master_night']]
+    actual_data['start_time'] = actual_data['start_time'].apply(lambda x: to_dict(x))
+    actual_data = actual_data.reset_index(drop=True)
+    master_start = pd.DataFrame(index=masters_data['master_name'])
+    master_start[['starts']] = 0
+
+    for idx in range(len(actual_data.index)):
+        dic = actual_data['start_time'][idx]
+        day = dic['day']
+        night = dic['night']
+        master_day = actual_data['master_day'][idx]
+        master_night = actual_data['master_night'][idx]
+        if type(master_day) is str:
+            master_start.loc[master_day, 'starts'] += day
+        if type(master_night) is str:
+            master_start.loc[master_night, 'starts'] += night
+
+    master_start = master_start.copy()
+
+    actual_data = c_data[['date_day', 'master_day', 'master_night']].set_index('date_day')
+    actual_data = actual_data[~actual_data.index.duplicated()].copy()
+    master_day_in_chill = actual_data.groupby('master_day').count()['master_night']
+    master_night_in_chill = actual_data.groupby('master_night').count()['master_day']
+    master_in_chill = pd.concat([master_data, master_day_in_chill, master_night_in_chill], axis=1, join='outer').fillna(0)
+    master_in_chill['chill_days'] = master_in_chill['master_night'] + master_in_chill['master_day']
+
+    master_in_chill = master_in_chill[['chill_days']]
+
+    pre_master_data = pd.concat([master_in_work, master_start, master_in_chill], axis=1, join='outer')
+    pre_master_data = pre_master_data.rename(columns={'work_days': f'work_days_{v}',
+                                                      'starts': f'starts_{v}',
+                                                      'chill_days': f'chill_days_{v}'})
+
+    master_data = pd.concat([master_data, pre_master_data], axis=1, join='outer')
+
+    df_mas = master_data
+    # print(master_data)
+    df_mas = df_mas.loc[:, [f'work_days_{v}', f'chill_days_{v}']].sort_values(f'work_days_{v}', ascending=True)
+    df_mas['sum'] = df_mas[f'work_days_{v}'] + df_mas[f'chill_days_{v}']
+    max_sum = df_mas['sum'].max()
+    df_mas['sum'] = df_mas['sum'].fillna(0)
+    df_mas['sum'] = df_mas['sum'].apply(lambda x: max_sum / x if x != 0 else x)
+    df_mas[f'work_days_{v}'] = df_mas[f'work_days_{v}'] * df_mas[f'sum'] / max_sum
+    df_mas[f'chill_days_{v}'] = df_mas[f'chill_days_{v}'] * df_mas[f'sum'] / max_sum
+    del df_mas['sum']
 
 
-actual_data['start_time'].apply(lambda x: to_list(x))
+    # print(df_mas)
 
-# print(time_list)
+    # df_mas.plot(kind='barh', stacked=True, color=['tomato', 'tab:blue'])
+    # # plt.bar(master_data.index, master_data['work_days'], color='red')
+    # # plt.bar(master_data.index, master_data['chill_days'], color='blue')
+    # # plt.yticks(np.arange(0, 2201, 200))
+    # plt.legend().remove()
+    # plt.xticks(rotation=30)
+    # # plt.grid(axis='y', linestyle=':')
+    # plt.show()
+
+    # df_mas = master_data.iloc[:9]
+    # df_mas = df_mas.loc[:, [f'work_days_{v}', f'chill_days_{v}']].sort_values(f'work_days_{v}', ascending=False)
+    # df_mas['sum'] = df_mas[f'work_days_{v}'] + df_mas[f'chill_days_{v}']
+    # max_sum = df_mas['sum'][-1]
+    # df_mas['sum'] = df_mas['sum'].apply(lambda x: max_sum / x)
+    # df_mas[f'work_days_{v}'] = df_mas[f'work_days_{v}'] * df_mas['sum'] / max_sum
+    # df_mas[f'chill_days_{v}'] = df_mas[f'chill_days_{v}'] * df_mas['sum'] / max_sum
+    # del df_mas['sum']
+    # df_mas = df_mas.fillna(0)
+    df_mas[f'work_days_{v}'] = df_mas[f'work_days_{v}'].fillna(0)
+    df_mas[f'work_days_{v}'] = df_mas[f'work_days_{v}'].apply(lambda x: x if x != 0 else 1)
+    df_mas[f'proportion_{v}'] = round(df_mas[f'work_days_{v}'] / df_mas[f'chill_days_{v}'], 2)
+    df_mas_total = pd.concat([df_mas_total, df_mas[[f'proportion_{v}']]], axis=1, join='outer')
 
 
-new_pd = pd.DataFrame(columns=['time', 'in'])
-# new_pd['time'] = time_list
-# new_pd['in'] = 1
-# new_pd = new_pd.groupby('time').count()
 
-d = defaultdict(int)
-
-for i in time_list:
-    d[i] += 1
-
-# print(sorted(d.items()))
-
-# plt.hist(time_list, bins=24, range=(0, 24))
-# plt.xticks(np.arange(0, 24, 1))
-# # plt.minorticks_on()
-# plt.grid(which='major', linestyle=':')
-# plt.grid(which='minor')
-# plt.tight_layout()
-num_list = list()
-rep_list = list()
-for j, k in sorted(d.items()):
-    num_list.append(j)
-    rep_list.append(k)
-
-num_list_day = num_list[8:21]
-num_list_night = num_list[0:8] + num_list[20:]
-rep_list_day = rep_list[8:21]
-rep_list_night = rep_list[0:8] + rep_list[20:]
-
-# plt.bar(num_list_day, rep_list_day, color='darkorange')
-# plt.bar(num_list_night, rep_list_night)
-# plt.xticks(np.arange(0, 24, 1))
-# plt.grid(which='major', axis='y')
-# plt.show()
-# print(new_pd)
-
-master_day_in_work = total_data.groupby('master_day').count()['info']
-master_night_in_work = total_data.groupby('master_night').count()['info']
-
-actual_data = chill_data[['date_day', 'master_day', 'info']].set_index('date_day')
+#
+actual_data = total_data[['date_day', 'master_day', 'master_night']].set_index('date_day')
 actual_data = actual_data[~actual_data.index.duplicated()].copy()
-master_day_in_chill = actual_data.groupby('master_day').count()['info']
-master_night_in_chill = chill_data.groupby('master_night').count()['info']
+master_day_in_work = total_data.groupby('master_day').count()['master_night']
+master_night_in_work = total_data.groupby('master_night').count()['master_day']
+master_in_work = pd.concat([master_data, master_day_in_work, master_night_in_work], axis=1, join='outer').fillna(0)
+master_in_work['work_days'] = master_in_work['master_night'] + master_in_work['master_day']
 
-print(master_day_in_chill)
+master_in_work = master_in_work[['work_days']]
 
+actual_data_dropna = total_data.loc[:, ['start_time']].dropna()
+actual_data = total_data.loc[actual_data_dropna.index, ['start_time', 'master_day', 'master_night']]
+actual_data['start_time'] = actual_data['start_time'].apply(lambda x: to_dict(x))
+actual_data = actual_data.reset_index(drop=True)
+master_start = pd.DataFrame(index=masters_data['master_name'])
+master_start[['starts']] = 0
+
+for idx in range(len(actual_data.index)):
+    dic = actual_data['start_time'][idx]
+    day = dic['day']
+    night = dic['night']
+    master_day = actual_data['master_day'][idx]
+    master_night = actual_data['master_night'][idx]
+    if type(master_day) is str:
+        master_start.loc[master_day, 'starts'] += day
+    if type(master_night) is str:
+        master_start.loc[master_night, 'starts'] += night
+
+master_start = master_start
+
+actual_data = chill_data[['date_day', 'master_day', 'master_night']].set_index('date_day')
+actual_data = actual_data[~actual_data.index.duplicated()].copy()
+master_day_in_chill = actual_data.groupby('master_day').count()['master_night']
+master_night_in_chill = actual_data.groupby('master_night').count()['master_day']
+master_in_chill = pd.concat([master_data, master_day_in_chill, master_night_in_chill], axis=1, join='outer').fillna(0)
+master_in_chill['chill_days'] = master_in_chill['master_night'] + master_in_chill['master_day']
+
+master_in_chill = master_in_chill[['chill_days']]
+
+pre_master_data = pd.DataFrame()
+pre_master_data = pd.concat([master_in_work, master_start, master_in_chill], axis=1, join='outer')
+pre_master_data = pre_master_data.rename(columns={'work_days': f'work_days_total',
+                                                  'starts': f'starts_total',
+                                                  'chill_days': f'chill_days_total'})
+
+master_data = pd.concat([master_data, pre_master_data], axis=1, join='outer')\
+    .sort_values('work_days_total', ascending=False)
+
+# master_data.to_csv('data_vault/total_data/master_data.csv')
+# master_data = pd.read_csv('data_vault/total_data/master_data.csv', index_col=0)
+# for v in analytics_data.columns[:-1]:
+#     v = int(v)
+#     m_data = master_data[[f'work_days_{v}', f'starts_{v}', f'chill_days_{v}']]
+#
+#     width = 0.2
+#     x_idx = np.arange(len(m_data.index))
+#
+#     plt.bar(x_idx - width, m_data[f'work_days_{v}'], width=width, color='green')
+#     plt.bar(m_data.index, m_data[f'starts_{v}'], width=width, color='darkorange')
+#     plt.bar(x_idx + width, m_data[f'chill_days_{v}'], width=width)
+#     # plt.yticks(np.arange(0, 2201, 200))
+#     plt.xticks(rotation=30)
+#     plt.grid(axis='y', linestyle=':')
+#     plt.show()
+
+
+
+df_mas = master_data
+df_mas = df_mas.loc[:, [f'work_days_total', f'chill_days_total']].sort_values(f'work_days_total', ascending=True)
+df_mas['sum'] = df_mas[f'work_days_total'] + df_mas[f'chill_days_total']
+max_sum = df_mas['sum'].max()
+df_mas['sum'] = df_mas['sum'].fillna(0)
+df_mas['sum'] = df_mas['sum'].apply(lambda x: max_sum / x if x != 0 else x)
+df_mas[f'work_days_total'] = df_mas[f'work_days_total'] * df_mas['sum'] / max_sum
+df_mas[f'chill_days_total'] = df_mas[f'chill_days_total'] * df_mas['sum'] / max_sum
+del df_mas['sum']
+# print(df_mas)
+# df_mas = df_mas.fillna(0)
+df_mas[f'chill_days_total'] = df_mas[f'chill_days_total'].fillna(0)
+df_mas[f'chill_days_total'] = df_mas[f'chill_days_total'].apply(lambda x: x if x != 0 else 1)
+df_mas[f'proportion_total'] = round(df_mas[f'work_days_total'] / df_mas[f'chill_days_total'], 2)
+df_mas_total = pd.concat([df_mas_total, df_mas[[f'proportion_total']]], axis=1, join='outer')
+
+df_mas_total.to_csv('data_vault/total_data/mast_prop_data.csv')
+# df_mas.plot(kind='barh', stacked=True, color=['tomato', 'tab:blue'])
+# # plt.bar(master_data.index, master_data['work_days'], color='red')
+# # plt.bar(master_data.index, master_data['chill_days'], color='blue')
+# # plt.yticks(np.arange(0, 2201, 200))
+# plt.legend().remove()
+# plt.xticks(rotation=30)
+# # plt.grid(axis='y', linestyle=':')
+# plt.show()
+
+# df_mas = master_data.iloc[:9]
+# df_mas = df_mas.loc[:, ['work_days', 'chill_days']].sort_values('work_days', ascending=False)
+# df_mas['sum'] = df_mas['work_days'] + df_mas['chill_days']
+# max_sum = df_mas['sum'][-1]
+# df_mas['sum'] = df_mas['sum'].apply(lambda x: max_sum / x)
+# df_mas['work_days'] = df_mas['work_days'] * df_mas['sum'] / max_sum
+# df_mas['chill_days'] = df_mas['chill_days'] * df_mas['sum'] / max_sum
+# del df_mas['sum']
+#
+# df_mas['proportion'] = round(df_mas['work_days'] / df_mas['chill_days'], 2)
+# df_mas.to_csv('data_vault/total_data/mast_prop_data.csv')
+# print(df_mas)  # Статистика по мастерам
+
+# REQUESTERS
+
+# Import Data
+# df = requester_data.sort_values('total', ascending=False).iloc[:50]
+# df = df[['total']].reset_index()
+# # print(df)
+# # df_raw = pd.read_csv("https://github.com/selva86/datasets/raw/master/mpg_ggplot2.csv")
+# # print(df_raw)
+# # Prepare Data
+# # df = df_raw.groupby('class').size().reset_index(name='counts')
+# # print(df)
+# labels = df.apply(lambda x: str(x[0]) + "\n (" + str(x[1]) + ")", axis=1)
+#
+# sizes = df['total'].values.tolist()
+# colors = [plt.cm.Spectral(i/float(len(labels))) for i in range(len(labels))]
+# # print(colors)
+#
+# # # Draw Plot
+# plt.figure(figsize=(12,8), dpi= 90)
+# squarify.plot(sizes=sizes, label=labels, color=colors, alpha=.8)
+#
+# # fig, ax = plt.subplots(figsize=(7,7), dpi=100, subplot_kw=dict(aspect=1.156))
+# # tr.treemap(ax, sizes, labels=labels,
+# #            fill=labels, cmap=['red','blue','cyan','black','gray','green'],
+# #            rectprops=dict(ec='w'),
+# #            textprops=dict(c='w'))
+#
+#
+# # # Decorate
+# # plt.title('Treemap of Vechile Class')
+# plt.axis('off')
+# plt.show()  #  Заявители по количеству заявок
+
+# MANUFACTURES
+
+# 1-й уровень, центр диаграммы
+# sum_counts = manufacture_data.reset_index()
+# sum_counts = sum_counts[['index', 'total']].sort_values('total', ascending=False)
+#
+# labels = ["Всего заявок: " + str(sum(sum_counts['total']))]
+#
+# parents = [""]
+# values = [sum(sum_counts['total'])]
+# # print(values)
+# #
+# # 2-й уровень, "лепестки" диаграммы
+# second_level_dict = {x: str(sum_counts['index'][x]) + '<br>' + str(sum_counts['total'][x]) for x in sum_counts.index}
+# labels += map(lambda x: second_level_dict[x], sum_counts.index)
+# parents += [labels[0]] * len(sum_counts.index)
+# values += sum_counts['total'].tolist()
+#
+# fig = go.Figure()
+# pull = [0] * len(sum_counts['total'])
+# # pull[sum_counts['total'].tolist().index(sum_counts['total'].max())] = 0.05
+# fig.add_trace(go.Pie(values=sum_counts['total'], labels=sum_counts['index'], pull=pull))
+# fig.show()
+
+
+# fig = go.Figure(go.Sunburst(
+#     labels = labels,
+#     parents = parents,
+#     values=values,
+#     branchvalues="total",
+#     # maxdepth=2,
+#     # insidetextorientation='radial'
+#     outsidetextfont=True
+# ))
+#
+# fig.update_layout(
+#     )
+
+# fig.update_layout(margin = dict(t=0, l=0, r=0, b=0))
+
+# fig.show()
 
 ''' Блок 5. Проверка
 '''
@@ -318,7 +604,7 @@ print(master_day_in_chill)
 ''' Архивный блок. 
 '''
 
-
+# print(analytics_data)
 
 
 
@@ -326,21 +612,24 @@ print(master_day_in_chill)
 Всего строк: 5062
 Рабочих ситуаций: 4046
 
-Всего мастеров: 20
-Отмечено уникальных заявителей: 429
+Всего мастеров: 14
+Отмечено уникальных заявителей: 428
 
 Данные с: 2017-07-19
 Данные по: 2024-03-01
 Всего рассмотрено дней: 2329
 Дней с заявками: 1701
 Дней без заявок: 791
-Соотношение: 2.15 к 1, т.е. из каждых 3х-4х дней на работе приходится 1 чиловый
+Соотношение: 2.15 к 1
+
+Из каждых 3х-4х дней на работе приходится 1 чиловый
 
 Среднее время исполнения заявок: 70 минут
+Заявок в среднем в день: 2.38
 
 ПО ГОДАМ разбить на переменные и визуализировать
 
-- графики можностей
+- графики мощностей
 - средние данные мощностей по годам
 
 '''
