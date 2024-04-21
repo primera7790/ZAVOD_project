@@ -319,7 +319,7 @@ def to_dict(data):
         hours = time.hour
         if hours >= 8 and hours < 20:
             time_dict['day'] += 1
-        else:
+        elif hours < 8 or hours >= 20:
             time_dict['night'] += 1
 
     return time_dict
@@ -333,10 +333,11 @@ for v in analytics_data.columns[:-1]:
     r_p_data = raw_prepared_data.loc[raw_prepared_data['date_day'].dt.year == v]
     t_data = total_data.loc[total_data['date_day'].dt.year == v]
     c_data = chill_data.loc[chill_data['date_day'].dt.year == v]
+
     actual_data = t_data[['date_day', 'master_day', 'master_night']].set_index('date_day')
     actual_data = actual_data[~actual_data.index.duplicated()].copy()
-    master_day_in_work = t_data.groupby('master_day').count()['master_night']
-    master_night_in_work = t_data.groupby('master_night').count()['master_day']
+    master_day_in_work = actual_data.groupby('master_day').count()['master_night']
+    master_night_in_work = actual_data.groupby('master_night').count()['master_day']
     master_in_work = pd.concat([master_data, master_day_in_work, master_night_in_work], axis=1, join='outer').fillna(0)
     master_in_work['work_days'] = master_in_work['master_night'] + master_in_work['master_day']
 
@@ -377,51 +378,51 @@ for v in analytics_data.columns[:-1]:
                                                       'chill_days': f'chill_days_{v}'})
 
     master_data = pd.concat([master_data, pre_master_data], axis=1, join='outer')
-
+#
     df_mas = master_data
-    # print(master_data)
+
     df_mas = df_mas.loc[:, [f'work_days_{v}', f'chill_days_{v}']].sort_values(f'work_days_{v}', ascending=True)
     df_mas['sum'] = df_mas[f'work_days_{v}'] + df_mas[f'chill_days_{v}']
     max_sum = df_mas['sum'].max()
-    df_mas['sum'] = df_mas['sum'].fillna(0)
+    # df_mas['sum'] = df_mas['sum'].fillna(0)
     df_mas['sum'] = df_mas['sum'].apply(lambda x: max_sum / x if x != 0 else x)
     df_mas[f'work_days_{v}'] = df_mas[f'work_days_{v}'] * df_mas[f'sum'] / max_sum
     df_mas[f'chill_days_{v}'] = df_mas[f'chill_days_{v}'] * df_mas[f'sum'] / max_sum
     del df_mas['sum']
-
-
-    # print(df_mas)
-
-    # df_mas.plot(kind='barh', stacked=True, color=['tomato', 'tab:blue'])
+#
+#
+#     # print(df_mas)
+#
+    df_mas.plot(kind='barh', stacked=True, color=['tomato', 'tab:blue'])
     # # plt.bar(master_data.index, master_data['work_days'], color='red')
     # # plt.bar(master_data.index, master_data['chill_days'], color='blue')
     # # plt.yticks(np.arange(0, 2201, 200))
-    # plt.legend().remove()
-    # plt.xticks(rotation=30)
-    # # plt.grid(axis='y', linestyle=':')
-    # plt.show()
-
-    # df_mas = master_data.iloc[:9]
-    # df_mas = df_mas.loc[:, [f'work_days_{v}', f'chill_days_{v}']].sort_values(f'work_days_{v}', ascending=False)
-    # df_mas['sum'] = df_mas[f'work_days_{v}'] + df_mas[f'chill_days_{v}']
-    # max_sum = df_mas['sum'][-1]
-    # df_mas['sum'] = df_mas['sum'].apply(lambda x: max_sum / x)
-    # df_mas[f'work_days_{v}'] = df_mas[f'work_days_{v}'] * df_mas['sum'] / max_sum
-    # df_mas[f'chill_days_{v}'] = df_mas[f'chill_days_{v}'] * df_mas['sum'] / max_sum
-    # del df_mas['sum']
-    # df_mas = df_mas.fillna(0)
-    df_mas[f'work_days_{v}'] = df_mas[f'work_days_{v}'].fillna(0)
-    df_mas[f'work_days_{v}'] = df_mas[f'work_days_{v}'].apply(lambda x: x if x != 0 else 1)
-    df_mas[f'proportion_{v}'] = round(df_mas[f'work_days_{v}'] / df_mas[f'chill_days_{v}'], 2)
-    df_mas_total = pd.concat([df_mas_total, df_mas[[f'proportion_{v}']]], axis=1, join='outer')
-
-
-
+    plt.legend().remove()
+    plt.xticks(rotation=30)
+    # plt.grid(axis='y', linestyle=':')
+    plt.show()
 #
+#     # df_mas = master_data.iloc[:9]
+#     # df_mas = df_mas.loc[:, [f'work_days_{v}', f'chill_days_{v}']].sort_values(f'work_days_{v}', ascending=False)
+#     # df_mas['sum'] = df_mas[f'work_days_{v}'] + df_mas[f'chill_days_{v}']
+#     # max_sum = df_mas['sum'][-1]
+#     # df_mas['sum'] = df_mas['sum'].apply(lambda x: max_sum / x)
+#     # df_mas[f'work_days_{v}'] = df_mas[f'work_days_{v}'] * df_mas['sum'] / max_sum
+#     # df_mas[f'chill_days_{v}'] = df_mas[f'chill_days_{v}'] * df_mas['sum'] / max_sum
+#     # del df_mas['sum']
+#     # df_mas = df_mas.fillna(0)
+#     df_mas[f'work_days_{v}'] = df_mas[f'work_days_{v}'].fillna(0)
+#     df_mas[f'work_days_{v}'] = df_mas[f'work_days_{v}'].apply(lambda x: x if x != 0 else 1)
+#     df_mas[f'proportion_{v}'] = round(df_mas[f'work_days_{v}'] / df_mas[f'chill_days_{v}'], 2)
+#     df_mas_total = pd.concat([df_mas_total, df_mas[[f'proportion_{v}']]], axis=1, join='outer')
+#
+#
+#
+# #
 actual_data = total_data[['date_day', 'master_day', 'master_night']].set_index('date_day')
 actual_data = actual_data[~actual_data.index.duplicated()].copy()
-master_day_in_work = total_data.groupby('master_day').count()['master_night']
-master_night_in_work = total_data.groupby('master_night').count()['master_day']
+master_day_in_work = actual_data.groupby('master_day').count()['master_night']
+master_night_in_work = actual_data.groupby('master_night').count()['master_day']
 master_in_work = pd.concat([master_data, master_day_in_work, master_night_in_work], axis=1, join='outer').fillna(0)
 master_in_work['work_days'] = master_in_work['master_night'] + master_in_work['master_day']
 
@@ -464,9 +465,9 @@ pre_master_data = pre_master_data.rename(columns={'work_days': f'work_days_total
 
 master_data = pd.concat([master_data, pre_master_data], axis=1, join='outer')\
     .sort_values('work_days_total', ascending=False)
-
+#
 # master_data.to_csv('data_vault/total_data/master_data.csv')
-# master_data = pd.read_csv('data_vault/total_data/master_data.csv', index_col=0)
+# # master_data = pd.read_csv('data_vault/total_data/master_data.csv', index_col=0)
 # for v in analytics_data.columns[:-1]:
 #     v = int(v)
 #     m_data = master_data[[f'work_days_{v}', f'starts_{v}', f'chill_days_{v}']]
@@ -481,47 +482,61 @@ master_data = pd.concat([master_data, pre_master_data], axis=1, join='outer')\
 #     plt.xticks(rotation=30)
 #     plt.grid(axis='y', linestyle=':')
 #     plt.show()
+#
+#
 
+# m_data = master_data[[f'work_days_total', f'starts_total', f'chill_days_total']]
+#
+# width = 0.2
+# x_idx = np.arange(len(m_data.index))
+#
+# plt.bar(x_idx - width, m_data[f'work_days_total'], width=width, color='green')
+# plt.bar(m_data.index, m_data[f'starts_total'], width=width, color='darkorange')
+# plt.bar(x_idx + width, m_data[f'chill_days_total'], width=width)
+# # plt.yticks(np.arange(0, 2201, 200))
+# plt.xticks(rotation=30)
+# plt.grid(axis='y', linestyle=':')
+# plt.show()
 
-
+#
 df_mas = master_data
 df_mas = df_mas.loc[:, [f'work_days_total', f'chill_days_total']].sort_values(f'work_days_total', ascending=True)
 df_mas['sum'] = df_mas[f'work_days_total'] + df_mas[f'chill_days_total']
 max_sum = df_mas['sum'].max()
-df_mas['sum'] = df_mas['sum'].fillna(0)
+# df_mas['sum'] = df_mas['sum'].fillna(0)
 df_mas['sum'] = df_mas['sum'].apply(lambda x: max_sum / x if x != 0 else x)
 df_mas[f'work_days_total'] = df_mas[f'work_days_total'] * df_mas['sum'] / max_sum
 df_mas[f'chill_days_total'] = df_mas[f'chill_days_total'] * df_mas['sum'] / max_sum
 del df_mas['sum']
-# print(df_mas)
+
 # df_mas = df_mas.fillna(0)
-df_mas[f'chill_days_total'] = df_mas[f'chill_days_total'].fillna(0)
-df_mas[f'chill_days_total'] = df_mas[f'chill_days_total'].apply(lambda x: x if x != 0 else 1)
-df_mas[f'proportion_total'] = round(df_mas[f'work_days_total'] / df_mas[f'chill_days_total'], 2)
-df_mas_total = pd.concat([df_mas_total, df_mas[[f'proportion_total']]], axis=1, join='outer')
-
-df_mas_total.to_csv('data_vault/total_data/mast_prop_data.csv')
-# df_mas.plot(kind='barh', stacked=True, color=['tomato', 'tab:blue'])
-# # plt.bar(master_data.index, master_data['work_days'], color='red')
-# # plt.bar(master_data.index, master_data['chill_days'], color='blue')
-# # plt.yticks(np.arange(0, 2201, 200))
-# plt.legend().remove()
-# plt.xticks(rotation=30)
-# # plt.grid(axis='y', linestyle=':')
-# plt.show()
-
-# df_mas = master_data.iloc[:9]
-# df_mas = df_mas.loc[:, ['work_days', 'chill_days']].sort_values('work_days', ascending=False)
-# df_mas['sum'] = df_mas['work_days'] + df_mas['chill_days']
-# max_sum = df_mas['sum'][-1]
-# df_mas['sum'] = df_mas['sum'].apply(lambda x: max_sum / x)
-# df_mas['work_days'] = df_mas['work_days'] * df_mas['sum'] / max_sum
-# df_mas['chill_days'] = df_mas['chill_days'] * df_mas['sum'] / max_sum
-# del df_mas['sum']
+# df_mas[f'chill_days_total'] = df_mas[f'chill_days_total'].fillna(0)
+# df_mas[f'chill_days_total'] = df_mas[f'chill_days_total'].apply(lambda x: x if x != 0 else 1)
+# df_mas[f'proportion_total'] = round(df_mas[f'work_days_total'] / df_mas[f'chill_days_total'], 2)
+# df_mas_total = pd.concat([df_mas_total, df_mas[[f'proportion_total']]], axis=1, join='outer')
 #
-# df_mas['proportion'] = round(df_mas['work_days'] / df_mas['chill_days'], 2)
-# df_mas.to_csv('data_vault/total_data/mast_prop_data.csv')
-# print(df_mas)  # Статистика по мастерам
+# df_mas_total.to_csv('data_vault/total_data/mast_prop_data.csv')
+df_mas.plot(kind='barh', stacked=True, color=['tomato', 'tab:blue'])
+# # # plt.bar(master_data.index, master_data['work_days'], color='red')
+# # # plt.bar(master_data.index, master_data['chill_days'], color='blue')
+# # # plt.yticks(np.arange(0, 2201, 200))
+plt.legend().remove()
+plt.xticks(rotation=30)
+# plt.grid(axis='y', linestyle=':')
+plt.show()
+#
+# # df_mas = master_data.iloc[:9]
+# # df_mas = df_mas.loc[:, ['work_days', 'chill_days']].sort_values('work_days', ascending=False)
+# # df_mas['sum'] = df_mas['work_days'] + df_mas['chill_days']
+# # max_sum = df_mas['sum'][-1]
+# # df_mas['sum'] = df_mas['sum'].apply(lambda x: max_sum / x)
+# # df_mas['work_days'] = df_mas['work_days'] * df_mas['sum'] / max_sum
+# # df_mas['chill_days'] = df_mas['chill_days'] * df_mas['sum'] / max_sum
+# # del df_mas['sum']
+# #
+# # df_mas['proportion'] = round(df_mas['work_days'] / df_mas['chill_days'], 2)
+# # df_mas.to_csv('data_vault/total_data/mast_prop_data.csv')
+# # print(df_mas)  # Статистика по мастерам
 
 # REQUESTERS
 
@@ -554,7 +569,7 @@ df_mas_total.to_csv('data_vault/total_data/mast_prop_data.csv')
 # # # Decorate
 # # plt.title('Treemap of Vechile Class')
 # plt.axis('off')
-# plt.show()  #  Заявители по количеству заявок
+# plt.show()  # Заявители по количеству заявок
 
 # MANUFACTURES
 
@@ -596,10 +611,14 @@ df_mas_total.to_csv('data_vault/total_data/mast_prop_data.csv')
 
 # fig.update_layout(margin = dict(t=0, l=0, r=0, b=0))
 
-# fig.show()
+# fig.show()  # визуализация по производствам
 
 ''' Блок 5. Проверка
 '''
+# actual_data = total_data[['date_day', 'master_day', 'master_night']].set_index('date_day')
+# actual_data = actual_data[~actual_data.index.duplicated()].copy()
+# print(actual_data.groupby('master_day').count()['master_night'])
+# print(actual_data.groupby('master_night').count()['master_day'])
 
 ''' Архивный блок. 
 '''
