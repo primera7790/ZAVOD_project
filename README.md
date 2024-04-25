@@ -18,5 +18,5 @@
 - переписать код под SQL запросы;
 - сформировать ряд "витринных" excel файлов, с 'учебными' данными, для демонстрации полного процесса.
 
-#### --> [Подробности исполнения проекта в директории zavod](https://github.com/primera7790/ZAVOD_project/tree/master/zavod) <--
+#### --> [Подробности исполнения проекта в директории 'zavod'](https://github.com/primera7790/ZAVOD_project/tree/master/zavod) <--
 
