@@ -2,7 +2,7 @@
 
 ### Изначальные данные имеют следующий вид:
 <p>
-  <img width='400px' src='https://github.com/primera7790/ZAVOD_project/blob/master/zavod/data/images/word_table.PNG' alt='word_table'/>
+  <img width='400px' src='https://github.com/primera7790/ZAVOD_project/blob/master/zavod/data/images/word_table_1.png' alt='word_table_1'/>
   <img width='400px' src='https://github.com/primera7790/ZAVOD_project/blob/master/zavod/data/images/word_table_2.PNG' alt='word_table_2'/>
 </p>
 
