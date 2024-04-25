@@ -41,8 +41,6 @@ def decision_tree(feature_train_data, targets_data, feature_prod_data, obj_names
 
     ''' КОРРЕКТИРОВКА ПРЕДСКАЗАНИЙ
     '''
-    # for_analize = pandas.DataFrame(columns=dirty_proba.columns)
-    # idxs = list()
 
     for idx in range(dirty_proba['idx'].max() + 1):
         obj_proba = dirty_proba.loc[dirty_proba['idx'] == idx]
@@ -61,28 +59,17 @@ def decision_tree(feature_train_data, targets_data, feature_prod_data, obj_names
         if 'ппп' in str(obj_names_from_prod.loc[idx, 'object_name']).lower():
             sum_proba[3] += 1
 
-        # if len(np.flatnonzero(sum_proba[1:] == np.max(sum_proba[1:]))) > 1:
-        #
-        #     sum_proba[0] = idx
-        #     for_analize.loc[len(for_analize.index)] = sum_proba
-        #
-        #     idxs.append(obj_names_from_prod.loc[idx, 'object_name'])
-
         sum_proba[0] = idx
         prediction = df_proba.columns[np.argmax(sum_proba[1:])]
 
         total_proba.loc[len(total_proba.index)] = sum_proba
         total_prediction.loc[idx, 'prediction'] = prediction
 
-    # for_analize['name'] = idxs
-
-    # for_analize.to_csv('data/total_data/for_analize.csv')
-
     total_proba['idx'] = total_proba['idx'].apply(int)
 
-    # ''' ВИЗУАЛИЗАЦИЯ
-    # '''
-    #
+    ''' ВИЗУАЛИЗАЦИЯ
+    '''
+
     # to_visual_data = pd.DataFrame(index=X.columns, columns=['imp'])
     # to_visual_data['imp'] = model.feature_importances_
     # to_visual_data = to_visual_data.sort_values('imp', ascending=False)
