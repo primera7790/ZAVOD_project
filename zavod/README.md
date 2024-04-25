@@ -60,17 +60,67 @@ p.s. колонка "requester" на данном этапе остается п
    - [список признаков, описывающих каждый объект](https://github.com/primera7790/ZAVOD_project/blob/master/zavod/data/total_data/obj_features.csv);
    - перечень известных наименований объектов;
 - Формируем таблицу объект-признак с целевыми значениями (для обучения модели):
-   - Отсекаем лишние повторяющиеся приписки (вроде об., отд.);
+  - Отсекаем лишние повторяющиеся приписки (вроде об., отд.);
+    <p>
+      <img width='130px' src='https://github.com/primera7790/ZAVOD_project/blob/master/zavod/data/images/obj_name_full.PNG' alt='obj_name_full'/>
+    </p>
+  
    - Присваиваем каждому объекту соответствующее ему производство (задаем целевой признак);
    - Сплитуем текст объектов по пробелу;
+     <p>
+       <img width='150px' src='https://github.com/primera7790/ZAVOD_project/blob/master/zavod/data/images/obj_name_split.PNG' alt='obj_name_split'/>
+     </p>
+    
    - Cоставляем перечень получившихся элементов списка с сохранением привязки к производству;
    - Переводим получившиевся данные в признаковое пространство
+     <p>
+       <img width='600px' src='https://github.com/primera7790/ZAVOD_project/blob/master/zavod/data/images/obj_name_split_features.PNG' alt='obj_name_split_features'/>
+     </p>
+    
 - Составляем перечень уникальных записей в колонке "object";
 - Формируем таблицу объект-признак по каждому объекту из табличных данных (для дальнейшего предсказания производств)
   
 ### 5.1. Классифицируем объекты по производствам
-Файл: feature_engineering.py
+Файл: decision_tree.py
+- Используем Decision Tree, алгоритм дерева решений:
+  - Обучаем модель на данных из таблицы объект-признак с целевыми значениями (удостоверившись в достаточности и объективности признаков);
+  - Определяем к кому производству относится каждый из объектов таблицы для предсказания;
+    <p>
+      <img width='1000px' src='https://github.com/primera7790/ZAVOD_project/blob/master/zavod/data/images/obj_name_split_dirty_proba.PNG' alt='obj_name_split_dirty_proba'/>
+    </p>
+    
+- Складываем вероятности отнесения к каждому из классов внутри каждого из объектов (напомню, мы их сплитовали);
+  <p>
+    <img width='1000px' src='https://github.com/primera7790/ZAVOD_project/blob/master/zavod/data/images/obj_name_full_total_proba.PNG' alt='obj_name_full_total_proba'/>
+  </p>
+  <p>
+    <img width='400px' src='https://github.com/primera7790/ZAVOD_project/blob/master/zavod/data/images/obj_name_full_total_prediction.PNG' alt='obj_name_full_total_prediction'/>
+  </p>
+  
+- Вносим корректировки, позволяющие избежать неправильного определения при паритете нескольких классов;
+  
+  #### Оценка значимости признаков полученной модели:
+  <p>
+    <img width='400px' src='https://github.com/primera7790/ZAVOD_project/blob/master/zavod/data/images/feature_importance.png' alt='feature_importance'/>
+  </p>
 
+ - Сохраняем полученные предсказания в колонку "manufacture" итоговой таблицы.
+   
+   #### Структура итоговой таблицы:
+   <p>
+     <img width='400px' src='https://github.com/primera7790/ZAVOD_project/blob/master/zavod/data/images/total_data_info.PNG' alt='total_data_info'/>
+   </p>
  
+## 5. Анализ данных и визуализация
+Файл: analytics.py
+#### Сам файл содержит лишь нагромождения независимых запросов
+#### [Результаты запросов сведены в ознокомительный .pdf файл]()
 
+
+## 6. ALL IN
+файл: main.py
+#### Содержит инструкции последовательной инициализации всех вышеописанных процессов
+<p>
+  <img width='400px' src='https://github.com/primera7790/ZAVOD_project/blob/master/zavod/data/images/main_process.PNG' alt='main_process'/>
+</p>
 
