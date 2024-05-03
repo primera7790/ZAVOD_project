@@ -6,7 +6,7 @@
   <img width='400px' src='https://github.com/primera7790/ZAVOD_project/blob/master/zavod/data/images/word_table_2.PNG' alt='word_table_2'/>
 </p>
 
-### Сторонними методами конвертируем в файлы формата .xlsx, после чего можно приступать.
+### Сторонними методами конвертируем 2139 подобных файлов из формата .docx в формат .xlsx, после чего можно приступать.
 
 ## 1. Сбор данных
 Файл: [data_mining.py](https://github.com/primera7790/ZAVOD_project/blob/master/zavod/data_mining.py)
