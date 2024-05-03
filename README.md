@@ -18,5 +18,5 @@
   
 
 ## Более подробное описание исполнения всех процессов:
-- либо по данной ссылке: [ссылка](https://github.com/primera7790/ZAVOD_project/tree/master/zavod);
+- либо по данной ссылке: [ссылка](https://github.com/primera7790/ZAVOD_project/tree/master/zavod) ;
 - либо в директории "zavod".
