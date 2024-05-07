@@ -1,8 +1,8 @@
 # Pet-project на реальных данных
 
-## Используемые технологи: 
-- Язык программирования: &nbsp; `python` ;
-- Основные библиотеки: &nbsp; `pandas` , `numpy` , `sklearn` , `matplotlib` ;
+## Технологи: 
+- Язык: &nbsp; `python` ;
+- Библиотеки: &nbsp; `pandas` , `numpy` , `sklearn` , `matplotlib` ;
 - ML-алгоритмы: &nbsp; `kNN` , `Decision Tree` .
   
 ## Описание:
