@@ -11,14 +11,6 @@ def main_preparation(data):
     :return: pandas dataframe
     """
 
-    data.loc[data['max_power'] == data['max_power'].max(), ['max_power', 'min_power', 'power_per_24_hours']] = 77, 80, 1914
-
-    while data['power_per_24_hours'].max() > 3000:
-        max_24 = data['power_per_24_hours'].max()
-        data.loc[data['power_per_24_hours'] == max_24, 'power_per_24_hours'] = int(str(int(max_24))[:-1])
-
-    data.loc[data['max_power'] == data['max_power'].max(), ['max_power', 'min_power']] = pd.NA
-
     data['date_day'] = pd.to_datetime(data['date_day']).dt.normalize()
     data['date_night'] = pd.to_datetime(data['date_night']).dt.normalize()
     data.loc[data['date_day'] == data['date_night'], 'date_night'] += pd.Timedelta('1 day')
@@ -48,9 +40,9 @@ def main_preparation(data):
     df_work_days.loc[:, 'end_time'] = df_work_days.loc[df_work_days['end_time'].notna(), 'end_time'].apply(
         lambda x: str(x).split())
 
-    # data.to_csv('data_vault/total_data/0_raw_prepared_data.csv')
-    # df_chill_days.to_csv('data_vault/total_data/df_chill_days.csv')
-    # df_work_days.to_csv('data_vault/total_data/1_prepared.csv')
+    # data.to_csv('data/total_data/0_raw_prepared_data.csv')
+    # df_chill_days.to_csv('data/total_data/df_chill_days.csv')
+    # df_work_days.to_csv('data/total_data/1_prepared.csv')
 
     return df_work_days
 
@@ -75,9 +67,9 @@ def object_names_to_list(data):
 def main():
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        raw_data = pd.read_csv('data_vault/total_data/csv/0_raw_data.csv', index_col=0)
+        raw_data = pd.read_csv('data/total_data/csv/0_raw_data.csv', index_col=0)
         # after_knn_file = pd.read_csv('data/total_data/csv/2_after_knn.csv', index_col=0)
-        total = pd.read_csv('data_vault/total_data/0_raw_data.csv', index_col=0)
+        total = pd.read_csv('data/total_data/0_raw_data.csv', index_col=0)
 
     main_preparation(raw_data)
     # object_names_to_list(after_knn_file)

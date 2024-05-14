@@ -20,16 +20,16 @@ from plotly.subplots import make_subplots
 '''
 with warnings.catch_warnings():
     warnings.simplefilter('ignore')
-    raw_data = pd.read_csv('data_vault/total_data/0_raw_data.csv', index_col=0)
-    raw_prepared_data = pd.read_csv('data_vault/total_data/0_raw_prepared_data.csv', index_col=0)
-    chill_data = pd.read_csv('data_vault/total_data/df_chill_days.csv', index_col=0)
-    total_data = pd.read_csv('data_vault/total_data/4_total_data.csv', index_col=0)
-    requesters_data = pd.read_csv('data_vault/total_data/csv/requesters.csv')
-    masters_data = pd.read_csv('data_vault/total_data/csv/masters.csv')
+    raw_data = pd.read_csv('data/total_data/0_raw_data.csv', index_col=0)
+    raw_prepared_data = pd.read_csv('data/total_data/0_raw_prepared_data.csv', index_col=0)
+    chill_data = pd.read_csv('data/total_data/df_chill_days.csv', index_col=0)
+    total_data = pd.read_csv('data/total_data/4_total_data.csv', index_col=0)
+    requesters_data = pd.read_csv('data/total_data/csv/requesters.csv')
+    masters_data = pd.read_csv('data/total_data/csv/masters.csv')
 
-    analytics_data = pd.read_csv('data_vault/total_data/analytics_data.csv', index_col=0)
-    manufacture_data = pd.read_csv('data_vault/total_data/manufacture_data.csv', index_col=0)
-    requester_data = pd.read_csv('data_vault/total_data/requester_data.csv', index_col=0)
+    analytics_data = pd.read_csv('data/total_data/analytics_data.csv', index_col=0)
+    manufacture_data = pd.read_csv('data/total_data/manufacture_data.csv', index_col=0)
+    requester_data = pd.read_csv('data/total_data/requester_data.csv', index_col=0)
 
 ''' Блок 2. Сравнение между файлами
 '''
@@ -201,9 +201,9 @@ master_data = pd.DataFrame(index=masters_data['master_name'])
 # manufacture_data = pd.concat([manufacture_data, req_from_man], axis=1)
 # requester_data = pd.concat([requester_data, req_on_rqst], axis=1)
 #
-# analytics_data.to_csv('data_vault/total_data/analytics_data.csv')
-# manufacture_data.to_csv('data_vault/total_data/manufacture_data.csv')
-# requester_data.to_csv('data_vault/total_data/requester_data.csv')
+# analytics_data.to_csv('data/total_data/analytics_data.csv')
+# manufacture_data.to_csv('data/total_data/manufacture_data.csv')
+# requester_data.to_csv('data/total_data/requester_data.csv')
 # # print(analytics_data)
 # # print(requester_data)  # Формирование an, man, req datas
 
@@ -465,8 +465,8 @@ pre_master_data = pre_master_data.rename(columns={'work_days': f'work_days_total
 master_data = pd.concat([master_data, pre_master_data], axis=1, join='outer')\
     .sort_values('work_days_total', ascending=False)
 #
-# master_data.to_csv('data_vault/total_data/master_data.csv')
-# # master_data = pd.read_csv('data_vault/total_data/master_data.csv', index_col=0)
+# master_data.to_csv('data/total_data/master_data.csv')
+# # master_data = pd.read_csv('data/total_data/master_data.csv', index_col=0)
 # for v in analytics_data.columns[:-1]:
 #     v = int(v)
 #     m_data = master_data[[f'work_days_{v}', f'starts_{v}', f'chill_days_{v}']]
@@ -514,7 +514,7 @@ del df_mas['sum']
 # df_mas[f'proportion_total'] = round(df_mas[f'work_days_total'] / df_mas[f'chill_days_total'], 2)
 # df_mas_total = pd.concat([df_mas_total, df_mas[[f'proportion_total']]], axis=1, join='outer')
 #
-# df_mas_total.to_csv('data_vault/total_data/mast_prop_data.csv')
+# df_mas_total.to_csv('data/total_data/mast_prop_data.csv')
 df_mas.plot(kind='barh', stacked=True, color=['tomato', 'tab:blue'])
 # # # plt.bar(master_data.index, master_data['work_days'], color='red')
 # # # plt.bar(master_data.index, master_data['chill_days'], color='blue')
@@ -534,7 +534,7 @@ plt.show()
 # # del df_mas['sum']
 # #
 # # df_mas['proportion'] = round(df_mas['work_days'] / df_mas['chill_days'], 2)
-# # df_mas.to_csv('data_vault/total_data/mast_prop_data.csv')
+# # df_mas.to_csv('data/total_data/mast_prop_data.csv')
 # # print(df_mas)  # Статистика по мастерам
 
 # REQUESTERS

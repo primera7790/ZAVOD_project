@@ -37,7 +37,7 @@ def decision_tree(feature_train_data, targets_data, feature_prod_data, obj_names
     total_prediction = obj_names_from_prod
     total_prediction['prediction'] = 'Завод'
 
-    dirty_proba.to_csv('data_vault/total_data/dirty_proba.csv')
+    # dirty_proba.to_csv('data/total_data/dirty_proba.csv')
 
     ''' КОРРЕКТИРОВКА ПРЕДСКАЗАНИЙ
     '''
@@ -110,10 +110,10 @@ def main():
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
 
-        feature_train_data = pd.read_csv('data_vault/total_data/features_train.csv', index_col=0)
-        targets_data = pd.read_csv('data_vault/total_data/obj_split_names.csv', index_col=0)
-        feature_prod_data = pd.read_csv('data_vault/total_data/features_prod.csv', index_col=0)
-        after_knn = pd.read_csv('data_vault/total_data/2_after_knn.csv', index_col=0)
+        feature_train_data = pd.read_csv('data/total_data/features_train.csv', index_col=0)
+        targets_data = pd.read_csv('data/total_data/obj_split_names.csv', index_col=0)
+        feature_prod_data = pd.read_csv('data/total_data/features_prod.csv', index_col=0)
+        after_knn = pd.read_csv('data/total_data/2_after_knn.csv', index_col=0)
         obj_names_from_prod = pd.DataFrame({'object_name': after_knn['object']})
 
         # obj_unique_from_data = pd.read_csv('data/total_data/csv/obj_unique_from_data.csv', index_col=0)

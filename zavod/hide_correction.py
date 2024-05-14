@@ -30,9 +30,9 @@ def requesters_correction(file):
 def main():
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        raw_file = pd.read_csv('data_vault/total_data/csv/0_raw_data.csv', index_col=0)
-        file = pd.read_csv('data_vault/total_data/csv/2_after_knn.csv', index_col=0)
-        file2 = pd.read_csv('data_vault/total_data/csv/requesters.csv', index_col=0)
+        raw_file = pd.read_csv('data/total_data/csv/0_raw_data.csv', index_col=0)
+        file = pd.read_csv('data/total_data/csv/2_after_knn.csv', index_col=0)
+        file2 = pd.read_csv('data/total_data/csv/requesters.csv', index_col=0)
 
     masters_correction(raw_file)
     # requesters_correction(file)

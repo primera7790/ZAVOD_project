@@ -29,7 +29,7 @@ def all_in(obj_names_data, obj_features, requesters_data):
 
     ''' СБОР ДАННЫХ
     '''
-    excel_dir = Path(Path(__file__).parent, 'data_vault/excel_dir')
+    excel_dir = Path(Path(__file__).parent, 'data/excel_dir')
 
     prod_data_table = data_mining.data_mining(df_total, excel_dir)
     print('2. ОБРАБОТКА И НОРМАЛИЗАЦИЯ ДАННЫХ...')
@@ -95,7 +95,7 @@ def all_in(obj_names_data, obj_features, requesters_data):
                                   'start_time', 'end_time', 'info', 'master_day', 'master_night', 'max_power',
                                   'min_power', 'power_per_24_hours', 'power_supply_scheme', 'file_name']]
 
-    # prod_data.to_csv('data_vault/total_data/4_total_data.csv')
+    prod_data.to_csv('data/total_data/total_data.csv')
     print('ГОТОВО')
 
     return
@@ -105,9 +105,9 @@ def main():
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
 
-        obj_names_data = pd.read_csv('data_vault/total_data/csv/obj_names.csv', index_col=0)
-        obj_features = pd.read_csv('data_vault/total_data/csv/obj_features.csv', index_col=0, header=None)
-        requesters_data = pd.read_csv('data_vault/total_data/csv/requesters.csv')
+        obj_names_data = pd.read_csv('data/total_data/csv/obj_names.csv', index_col=0)
+        obj_features = pd.read_csv('data/total_data/csv/obj_features.csv', index_col=0, header=None)
+        requesters_data = pd.read_csv('data/total_data/csv/requesters.csv')
 
         # after_knn_file = pd.read_csv('data/total_data/csv/2_after_knn.csv', index_col=0)
         # obj_unique_from_data = pd.read_csv('data/total_data/csv/obj_unique_from_data.csv', index_col=0)
