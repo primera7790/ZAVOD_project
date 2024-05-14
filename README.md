@@ -18,7 +18,21 @@
 - перевод определенных данных в признаковое пространство и дальнейшая классификация при помощи ___Decision Tree___ модели;
 - агрегация, аналитика и визуализация (формирование презентации).
   
-
 ### Более подробное описание исполнения всех процессов:
 - либо по данной ссылке: &nbsp; [ссылка](https://github.com/primera7790/ZAVOD_project/tree/master/zavod) ;
-- либо в директории "zavod".
+- либо в README.md файле директории "zavod".
+
+## Важное дополнение
+&nbsp; &nbsp; В проект добавлены демонстрационные данные.<br>
+&nbsp; &nbsp; Во избежание разглашения персональных данных и закрытой информации, данные демонстрационных файлов были вольно изменены.<br>
+&nbsp; &nbsp; Фамилии были сгенерированы случайно при помощи сервиса [randomus.ru](https://randomus.ru/). Все совпадения с реальными лицами случайны.
+
+## Инструкция по запуску
+1. Скачать/скопировать данные репозитория;
+2. Установить зависимости, указанные в файле `requirements.txt` ;
+3. Запустить файл `/zavod/main.py` .
+
+Основные директории:
+- Сырые данные: &nbsp; [/zavod/data/excel_dir/](https://github.com/primera7790/ZAVOD_project/tree/master/zavod/data/excel_dir);
+- Данные для обучения моделей: &nbsp; [zavod/data/total_data/csv/](https://github.com/primera7790/ZAVOD_project/tree/master/zavod/data/total_data/csv);
+- Итоговая таблица: [/zavod/data/total_data](https://github.com/primera7790/ZAVOD_project/tree/master/zavod/data/total_data).
