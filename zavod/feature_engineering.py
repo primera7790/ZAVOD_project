@@ -6,13 +6,14 @@ from transliterate import translit
 
 
 def to_objects_split(data, train=False, prod=False):
-    ''' Подготовка данных для дальнейшего признакового анализа
+    """ Подготовка данных для дальнейшего признакового анализа
 
     :param data: pandas dataframe, содержащий перечень объектов и их принадлежность к конкретному производству
     :param train: bool, если подготавливаем данные для обучения - True
     :param prod: bool, если подготавливаем данные для предсказания - True
     :return: pandas dataframe
-    '''
+    """
+
     to_correct_list = ['Об.', 'об.', 'Отд.', 'отд.', 'Кор.', 'кор.', 'к.', 'К.', 'Отд', 'Цех']
 
     if train:
@@ -52,20 +53,14 @@ def to_objects_split(data, train=False, prod=False):
 
 
 def feature_engineering(data, features, train=False, prod=False):
-    ''' Превращаем данные в набор признаков
+    """ Превращаем данные в набор признаков
 
     :param data: pandas dataframe, содержащий подготовленные объекты
     :param features: pandas dataframe, являющийся перечнем желаемых признаков
     :param train: bool, если подготавливаем данные для обучения - True
     :param prod: bool, если подготавливаем данные для предсказания - True
     :return: .csv файл
-    '''
-    ''' 
-
-    :param data: pandas dataframe, содержащий подготовленные объекты
-    :param features: pandas dataframe, являющийся перечнем желаемых признаков
-    :return: pandas dataframe
-    '''
+    """
 
     def for_each_object(obj_name, features_num):
         ''' Проходимся по имени объекта и формируем все признаки

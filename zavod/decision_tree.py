@@ -8,14 +8,14 @@ from sklearn.tree import DecisionTreeClassifier
 
 
 def decision_tree(feature_train_data, targets_data, feature_prod_data, obj_names_from_prod):
-    ''' Обучаем модель и предсказываем целевые значения
+    """ Обучаем модель и предсказываем целевые значения
 
     :param feature_train_data: pandas dataframe, имена тренировочных объектов в признаковом пространстве
     :param targets_data: pandas dataframe, целевые признаки
     :param feature_prod_data: pandas dataframe, имена объектов на предсказание в признаковом пространстве
     :param obj_names_from_prod: pandas dataframe, полные имена объектов на предсказание
     :return: pandas dataframe и 2 .csv файла
-    '''
+    """
 
     ''' ОБУЧЕНИЕ МОДЕЛИ
     '''
@@ -88,12 +88,12 @@ def decision_tree(feature_train_data, targets_data, feature_prod_data, obj_names
 
 
 def accuracy(targets, predictions):
-    ''' Замер точности предсказаний
+    """ Замер точности предсказаний
 
     :param targets: pandas series, реальные значения
     :param predictions: pandas series, предсказанные значения
     :return: int, значение точности предсказания [0, 1]
-    '''
+    """
     obj_num = len(targets)
     loss_count = 0
 

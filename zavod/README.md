@@ -56,7 +56,7 @@ p.s. колонка "requester" на данном этапе остается п
 Файл: [feature_engineering.py](https://github.com/primera7790/ZAVOD_project/blob/master/zavod/feature_engineering.py)
 - Составляем:
    - список целевых признаков, т.е. всех производств на заводе;
-   - [список признаков, описывающих каждый объект](https://github.com/primera7790/ZAVOD_project/blob/master/zavod/data/total_data/obj_features.csv);
+   - [список признаков, описывающих каждый объект](https://github.com/primera7790/ZAVOD_project/blob/master/zavod/data/total_data/csv/obj_features.csv);
    - перечень известных наименований объектов;
 - Формируем таблицу объект-признак с целевыми значениями (для обучения модели):
   - Отсекаем лишние повторяющиеся приписки (вроде об., отд.);

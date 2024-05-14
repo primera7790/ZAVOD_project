@@ -5,12 +5,12 @@ import pandas as pd
 
 
 def comparing(text, target_name):
-    ''' Вычисляем максимальную комбинацию, сравнивая фамилии и текст информации заявки
+    """ Вычисляем максимальную комбинацию, сравнивая фамилии и текст информации заявки
 
     :param text: str, текст столбца 'info' отдельно взятой заявки
     :param target_name: str, фамилия одного из потенциальных заявителей
     :return: int, максимальное значение комбинации символов
-    '''
+    """
 
     max_combo = 0
     count_step = 0
@@ -48,7 +48,7 @@ def comparing(text, target_name):
 
 
 def knn_algo(data, requesters_data):
-    ''' Предсказываем фамилию заявителя
+    """ Предсказываем фамилию заявителя
 
     Находим фамилию с самым крупным весом относительно информации по заявке.
     Веса формирует комбинация совпадений последовательностей символов.
@@ -56,7 +56,7 @@ def knn_algo(data, requesters_data):
     :param data: pandas dataframe, с подготовленными собранными данными
     :param requesters_data: pandas dataframe, содержащий фамилии потенциальных заявителей
     :return: .csv файл
-    '''
+    """
 
     info_data = data['info'].apply(lambda x: x[:90] if len(x) > 100 else x[:50])
     targets_data = requesters_data['requester_name']

@@ -9,13 +9,13 @@ from tqdm.auto import tqdm
 
 
 def data_filter(dirty_data: list, date_name=False, time=False):
-    '''Приведение данных к общему виду
+    """Приведение данных к общему виду
 
     :param dirty_data: list, содержащий ненормированные данные
     :param date_name: bool, если dirty_data имеет вид [дата, [мастера,]]
     :param time: bool, если dirty_data имеет вид [время,]
     :return: list, содержащий нормированные данные
-    '''
+    """
 
     filtered_data = dirty_data.copy()
     if date_name is True:
@@ -33,13 +33,13 @@ def data_filter(dirty_data: list, date_name=False, time=False):
 
 
 def change_power_data(table, row_idx, col_idx):
-    '''Адресный сбор данных по мощности из таблицы
+    """Адресный сбор данных по мощности из таблицы
 
     :param table: pandas dataframe, данные с файла
     :param row_idx: int, индекс строки
     :param col_idx: int, индекс колонки
     :return: list, список из четырех элементов
-    '''
+    """
 
     max_p = pd.NA if type(table.iloc[row_idx, col_idx]) is str or math.isnan(table.iloc[row_idx, col_idx]) \
         else int(table.iloc[row_idx, col_idx])
@@ -53,11 +53,11 @@ def change_power_data(table, row_idx, col_idx):
 
 
 def data_normalize(data_before_norm: list):
-    '''Приведение значения года в общей дате к виду 'YYYY', в частности '20..'
+    """Приведение значения года в общей дате к виду 'YYYY', в частности '20..'
 
     :param data_before_norm: list, список вида [день, месяц, год]
     :return: list, список с корректными данными
-    '''
+    """
 
     y = data_before_norm.copy()
     if len(y[2]) == 2:
@@ -67,12 +67,12 @@ def data_normalize(data_before_norm: list):
 
 
 def data_mining(total_data, dir_path):
-    ''' Сбор и компоновка данных из excel-таблиц, конвертированных из word-документов
+    """ Сбор и компоновка данных из excel-таблиц, конвертированных из word-документов
 
     :param total_data: pandas dataframe, подготовленный для сбора данных
     :param dir_path: path, содержащий путь к директории с .xlsx файлами
     :return: pandas dataframe
-    '''
+    """
 
     '''
     
